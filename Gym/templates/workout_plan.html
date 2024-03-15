@@ -1,0 +1,162 @@
+{% load static %}
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{today}}'s Workout Plan</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Roboto', sans-serif;
+    background-color: #f9f9f9;
+    color: #333;
+  }
+  .container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background: linear-gradient(45deg, #fafafa, #f0f0f0);
+    border-radius: 20px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+  .container:hover {
+    transform: scale(1.01);
+  }
+  h1, h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-weight: 700;
+    color: #222;
+  }
+  h2 {
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 10px;
+  }
+  .exercise {
+    margin-bottom: 30px;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 20px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+  }
+  .exercise:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+  }
+  .exercise h3 {
+    margin-bottom: 10px;
+    color: #555;
+    font-size: 24px;
+  }
+  .exercise p {
+    color: #777;
+    font-size: 18px;
+    line-height: 1.6;
+  }
+  .exercise img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto 10px;
+    border-radius: 20px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+  }
+  .exercise img:hover {
+    transform: scale(1.05);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+  }
+
+  .button-64 {
+  align-items: center;
+  background-image: linear-gradient(144deg,#AF40FF, #5B42F3 50%,#00DDEB);
+  border: 0;
+  border-radius: 8px;
+  box-shadow: rgba(151, 65, 252, 0.2) 0 15px 30px -5px;
+  box-sizing: border-box;
+  color: #FFFFFF;
+  display: flex;
+  font-family: Phantomsans, sans-serif;
+  font-size: 20px;
+  justify-content: center;
+  line-height: 1em;
+  max-width: 100%;
+  min-width: 140px;
+  padding: 3px;
+  text-decoration: none;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.button-64:active,
+.button-64:hover {
+  outline: 0;
+}
+
+.button-64 span {
+  background-color: rgb(5, 6, 45);
+  padding: 16px 24px;
+  border-radius: 6px;
+  width: 100%;
+  height: 100%;
+  transition: 300ms;
+}
+
+.button-64:hover span {
+  background: none;
+}
+
+@media (min-width: 768px) {
+  .button-64 {
+    font-size: 24px;
+    min-width: 196px;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>{{today}}'s Workout Plan</h1>
+  
+  <h2>Warm-up</h2>
+  <div class="exercise">
+    <h3>Jumping Jacks</h3>
+    <img src="{% static 'exercises/jumping_jacks.gif' %}" alt="Jumping Jacks">
+    <p>Jumping jacks are a great warm-up exercise to get your heart pumping and your muscles warmed up.</p>
+  </div>
+  
+  <div class="exercise">
+    <h3>Arm Circles</h3>
+    <img src="{% static 'exercises/arm_circles.gif' %}" alt="Arm Circles">
+    <p>Arm circles help improve flexibility and range of motion in the shoulders, preparing them for more intense exercises.</p>
+  </div>
+  <div class="exercise">
+    <h3>Push-ups</h3>
+    <img src="{% static 'exercises/pushups.gif' %}" alt="Push-ups">
+    <p>Push-ups are a classic bodyweight exercise that strengthens the chest, shoulders, triceps, and core muscles.</p>
+  </div>
+
+  <h2>Rest</h2>
+  <div class="exercise">
+    <h3>Rest</h3>
+    <p>Take a 1-minute break before the next set of exercises.</p>
+  </div>
+  
+  <h3>Click on "Start" To StartMainExercises if You Have Done Warm-up!</h3>
+  <center><a href="/workout?pid={{user.id}}" style="text-decoration: none;">
+    <button class="button-64" role="button"><span class="text">Start Main Exercises</span></button>
+    </a></center>
+
+</div>
+
+</body>
+</html>

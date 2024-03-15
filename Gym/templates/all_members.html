@@ -1,0 +1,41 @@
+{% extends 'admin_base.html' %} {% load static %} {% block content %}
+
+<div id="page-wrapper">
+  <div id="page-inner">
+
+    <form class="d-flex" method="post" action="/searchPage">
+      {% csrf_token %}
+      <input class="form-control me-2" name="searchedMember" placeholder="Search Here For Member">
+      <button class="btn btn-danger" style="float: inline-end; margin-top: 10px; margin-right: 20px;"  type="submit">Search</button>
+    </form>
+
+    <div class="row">
+      <div class="col-md-12">
+        <h2>All Members List : </h2>
+      </div>
+    </div>
+
+    
+    <pre></pre>
+    
+    
+      
+    <div class="row">
+      {% for user in users %}
+      <div>
+        <a href="/userdetails?u_id={{user.id}}" style="text-decoration: none;"><div class="panel panel-back noti-box">
+          <span class="icon-box bg-color-red set-icon" style="height: 80px; width: 80px; border-radius: 50%;"  >
+            <img src="{{user.image.url}}" style="height: 80px; width: 80px; border-radius: 50%;"  />
+          </span>
+          <div class="text-box">
+            <p class="main-text">{{user.first_name}}&nbsp;{{user.last_name}}</p>
+            <p class="text-muted">@{{user.username}}</p>
+          </div></a>
+        </div>
+      {% endfor %}
+    </div>
+
+  </div>
+</div>
+
+{% endblock %}

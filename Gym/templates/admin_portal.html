@@ -1,0 +1,137 @@
+{% extends 'admin_base.html' %} {% load static %} {% block content %}
+
+
+
+<div id="page-wrapper">
+  <div id="page-inner">
+    <div class="row">
+      <div class="col-md-12">
+        <h2>Welcome {{admin.first_name}} {{admin.last_name}} !</h2>
+        <pre></pre>
+      <h2 style="font-size: 24px">Admin Dashboard:</h2>
+      </div>
+      
+    </div>
+    <!-- /. ROW  -->
+    <div class="row">
+      <div class="col-md-3 col-sm-6 col-xs-6">
+
+        <a href="/new_registration" style="text-decoration:none;">  
+          <div class="panel panel-back noti-box">
+          <span class="icon-box bg-color-red set-icon">
+            <img src="{% static '/images/add.png' %}" style="height: 58px;">
+          </span>
+          <br><br><br>
+          <div class="text-box">
+            <p class="main-text" >Add New Member</p>
+            <p class="text-muted"></p>
+          </div>
+        </div>
+        </a>
+      </div>
+      <div class="col-md-3 col-sm-6 col-xs-6">
+        <a href="/all_members" style="text-decoration:none;">
+          <div class="panel panel-back noti-box">
+          <span class="icon-box bg-color-green set-icon">
+            <img src="{% static '/images/all.png' %}" style="height: 58px;">
+          </span>
+          <br><br><br>
+            <div class="text-box">
+            <p class="main-text">See All Members</p>
+            <p class="text-muted"></p>
+          </div>
+        </div>
+      </div>
+    </a>
+      <div class="col-md-3 col-sm-6 col-xs-6">
+        <a href="/attendance" style="text-decoration:none;">
+          <div class="panel panel-back noti-box">
+          <span class="icon-box bg-color-blue set-icon">
+            <i class="fa fa-edit fa-3x" style="padding: 10%; font-size: 58px;"></i>
+          </span>
+          <br><br><br>
+          <div class="text-box">
+            <p class="main-text">Take Attendance</p>
+            <p class="text-muted"></p>
+          </div>
+        </div>
+        </a>
+      </div>
+      <div class="col-md-3 col-sm-6 col-xs-6">
+        <a href="/change_admin_password?a_id={{admin.id}}" style="text-decoration:none;">
+          <div class="panel panel-back noti-box">
+          <span class="icon-box bg-color-brown set-icon">
+            <img src="{% static '/images/changepassword.png' %}" style="height: 58px; padding-top: 9%;">
+          </span>
+          <br><br><br>
+          <div class="text-box">
+            <p class="main-text">Change Password</p>
+            <p class="text-muted"></p>
+          </div>
+        </div>
+      </a>
+      </div>
+    </div>
+
+
+    <!-- <div class="row">
+      <div class="col-md-6 col-sm-12 col-xs-12">
+        <div class="panel panel-back noti-box">
+          <span class="icon-box bg-color-blue">
+            <i class="fa fa-warning"></i>
+          </span>
+          <div class="text-box">
+            <p class="main-text">52 Important Issues to Fix</p>
+            <p class="text-muted">Please fix these issues to work smooth</p>
+            <p class="text-muted">Time Left: 30 mins</p>
+            <hr />
+            <p class="text-muted">
+              <span class="text-muted color-bottom-txt"
+                ><i class="fa fa-edit"></i>
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit gthn.
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit gthn.
+              </span>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-3 col-sm-12 col-xs-12">
+        <div class="panel back-dash">
+          <i class="fa fa-dashboard fa-3x"></i><strong> &nbsp; SPEED</strong>
+          <p class="text-muted">
+            Lorem ipsum dolor sit amet, consectetur adipiscing sit ametsit amet
+            elit ftr. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+          </p>
+        </div>
+      </div>
+      <div class="col-md-3 col-sm-12 col-xs-12">
+        <div class="panel">
+          <div class="main-temp-back">
+            <div class="panel-body">
+              <div class="row">
+                <div class="col-xs-6">
+                  <i class="fa fa-cloud fa-3x"></i> Newyork City
+                </div>
+                <div class="col-xs-6">
+                  <div class="text-temp">10°</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="panel panel-back noti-box">
+          <span class="icon-box bg-color-green set-icon">
+            <i class="fa fa-desktop"></i>
+          </span>
+          <div class="text-box">
+            <p class="main-text">Display</p>
+            <p class="text-muted">Looking Good</p>
+          </div>
+        </div>
+      </div>
+
+      {% endblock %}
+    </div> -->
+  </div>
+</div>

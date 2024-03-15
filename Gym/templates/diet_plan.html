@@ -1,0 +1,23 @@
+{% load static %}
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Diet Plan</title>
+  <link rel="stylesheet" href="{% static 'css/styles_of_dietplan.css' %}">
+</head>
+<body>
+  <div class="container">
+    <div class="image-container">
+      <img id="mainImage" src="{% static 'images/dietplan.png' %}" alt="Main Image">
+    </div>
+    <div class="controls">
+      <button id="zoomIn">Zoom In</button>
+      <button id="zoomOut">Zoom Out</button>
+      <a id="downloadLink" download="dietplan.png" href="#">Download</a>
+    </div>
+  </div>
+  <script src="{% static 'js/script_of_dietplan.js' %}"></script>
+</body>
+</html>

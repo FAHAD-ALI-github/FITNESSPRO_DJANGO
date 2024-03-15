@@ -1,0 +1,70 @@
+{% extends 'admin_base.html' %} {% load static %} {% block content %}
+
+
+        <div id="page-wrapper" >
+            <div id="page-inner">
+                <div class="row">
+                    <div class="col-md-12">
+                     <h2>Attendance</h2>   
+                        
+                    </div>
+                </div> 
+                
+                          
+                 <!-- /. ROW  -->
+                  <pre></pre>
+                  {% if msg %}
+                  <div class="alert alert-success mx-3" role="alert">
+                  {{msg}}
+                  </div>
+                  <br><br>
+                  {% endif %}
+                  <!-- <br><br> -->
+           
+                  <center>
+                    <form method="post" action="/attendance"> 
+                      {% csrf_token %}
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                              <span class="input-group-text" id="inputGroup-sizing-default">id # </span>
+                            </div>
+                            <input type="number" value=0 class="form-control" aria-label="Default" name="1" aria-describedby="inputGroup-sizing-default">
+                          </div>
+                          <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                              <span class="input-group-text" id="inputGroup-sizing-default">id # </span>
+                            </div>
+                            <input type="number" value=0 class="form-control" aria-label="Default" name="2" aria-describedby="inputGroup-sizing-default">
+                          </div>
+                          <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                              <span class="input-group-text" id="inputGroup-sizing-default">id # </span>
+                            </div>
+                            <input type="number" value=0 class="form-control" aria-label="Default" name="3" aria-describedby="inputGroup-sizing-default">
+                          </div>
+                          <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                              <span class="input-group-text" id="inputGroup-sizing-default">id # </span>
+                            </div>
+                            <input type="number" value=0 class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default" name="4">
+                          </div>
+                          <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                              <span class="input-group-text" id="inputGroup-sizing-default">id # </span>
+                            </div>
+                            <input type="number" value=0 class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default" name="5">
+                          </div>
+        <br><br>
+                        <button type="submit" class="btn btn-primary">Take Attendance (Mark as present) </button>
+                      </form>
+                  </center>
+
+
+                  
+                                
+
+
+			
+            </div>
+        
+               {% endblock %}

@@ -1,0 +1,38 @@
+{% load static %}
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YourMainExercises for {{today}}</title>
+  <link rel="stylesheet" href="{% static 'css/styles_of_dietplan.css' %}">
+</head>
+<body><h1>{{exercise}}</h1>
+  <div class="container" style="background-color: rgb(255, 255, 255);">
+    <div class="image-container">
+{% if exercise == 'chest' %}
+<img id="mainImage" src="{% static 'exercises/chest.png' %}" alt="Workout">
+{% elif exercise == 'back' %}
+<img id="mainImage" src="{% static 'exercises/back.png' %}" alt="Workout">
+{% elif exercise == 'shoulder' %}
+<img id="mainImage" src="{% static 'exercises/shoulder.png' %}" alt="Workout">
+{% elif exercise == 'bicep-tricep' %}
+<img id="mainImage" src="{% static 'exercises/bicep-tricep.png' %}" alt="Workout">
+{% elif exercise == 'leg' %}
+<img id="mainImage" src="{% static 'exercises/leg.png' %}" alt="Workout">
+{% elif exercise == 'push' %}
+<img id="mainImage" src="{% static 'exercises/push.png' %}" alt="Workout">
+{% elif exercise == 'pull' %}
+<img id="mainImage" src="{% static 'exercises/pull.png' %}" alt="Workout">
+{% endif %}
+
+    </div>
+    <div class="controls">
+      <button id="zoomIn">Zoom In</button>
+      <button id="zoomOut">Zoom Out</button>
+      <a id="downloadLink" download="dietplan.png" href="#">Download</a>
+    </div>
+  </div>
+  <script src="{% static 'js/script_of_dietplan.js' %}"></script>
+</body>
+</html>

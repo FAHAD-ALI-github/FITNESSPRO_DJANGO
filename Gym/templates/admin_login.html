@@ -1,0 +1,224 @@
+{% load static %}
+
+<html lang="en">
+
+<head>
+  
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+  <title>Fitnesspro</title>
+  <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css" />
+  <link rel="stylesheet" type="text/css" href="{% static '/css/bootstrap.css' %}" />
+  <link href="https://fonts.googleapis.com/css?family=Poppins:400,600,700&display=swap" rel="stylesheet">
+  <link href="{% static '/css/loginpage_styling.css' %}" rel="stylesheet" />
+  <link href="{% static '/css/responsive.css' %}" rel="stylesheet" />
+  <!-- google-fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Agbalumo&family=Averia+Libre:wght@700&family=Dancing+Script:wght@700&family=Nova+Square&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Agbalumo&family=Averia+Libre:wght@700&family=Dancing+Script:wght@700&family=Nova+Square&display=swap" rel="stylesheet">
+</head>
+
+
+<body>
+
+  <div class="hero_area">
+    <!-- header section starts -->
+    <header class="header_section">
+      <div class="container-fluid">
+        <nav class="navbar navbar-expand-lg custom_nav-container ">
+          <a class="navbar-brand" href="/">
+            <span>
+                Fitnesspro
+            </span>
+          </a>
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+
+          <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <div class="d-flex ml-auto flex-column flex-lg-row align-items-center">
+              <ul class="navbar-nav  ">
+                <li class="nav-item active">
+                  <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item ">
+                  <a class="nav-link" href="/login">My Profile </a>
+                </li>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="/admin_login">Admin</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="/contact"> Contact Us</a>
+                </li>
+              </ul>
+              
+              
+            </div>
+          </div>
+        </nav>
+      </div>
+    </header>
+    <!-- end header section -->
+
+
+<div class="formbold-main-wrapper" style="font-size: larger; color: rgb(255, 255, 255); margin-bottom: 90px; " >
+    <div class="formbold-form-wrapper">
+      
+      <form action="/admin_login" method="POST">
+        {% csrf_token %}
+        <br>
+      <center><h1>ADMIN LOGIN HERE!</h1></center>
+      <br>
+      {% if error %}
+         <div class="alert alert-danger" role="alert">
+         {{error}}
+       </div>
+         {% endif %}
+        <div class="form-outline mb-4">
+            <label class="form-label" for="form2Example1">Username:</label>
+          <input type="text" id="form2Example1" class="form-control" name="a_username"/>
+        </div>
+      
+
+        <div class="form-outline mb-4">
+            <label class="form-label" for="Example">Password:</label>
+          <input type="password" id="Example" class="form-control" name="a_password"/>
+        </div>
+      
+        <!-- 2 column grid layout for inline styling -->
+        <div class="row mb-4">
+          <div class="col d-flex ">
+            <!-- Checkbox -->
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="form2Example31" onclick="showPassword()"  />
+              <label class="form-check-label" for="form2Example31" > Show password </label>
+            </div>
+          </div>
+      
+          
+        </div>
+      
+        <button type="submit" class="btn btn-danger btn-block mb-4">Log in</button>
+      
+      </form>
+     </div>
+    </div>
+
+
+     <!-- Footer -->
+ <footer class="text-center text-lg-start bg-body-tertiary text-muted ">
+
+  <!-- Section: Links  -->
+  <section class="section_links">
+    <div class="container text-center text-md-start mt-5">
+      <!-- Grid row -->
+      <div class="row mt-3">
+        <!-- Grid column -->
+        <div class="col-md-3 col-lg-4 col-xl-3 mx-auto mb-4">
+          <!-- Content -->
+          <h6 class="text-uppercase fw-bold mb-4">
+            <i class="fas fa-gem me-3"></i><pre><pre></pre></pre><pre></pre>
+            |&nbsp;Company name&nbsp;|
+          </h6>
+          <p>
+            Here you can use rows and columns to organize your footer content. Lorem ipsum
+            dolor sit amet, consectetur adipisicing elit.
+          </p>
+        </div>
+        <!-- Grid column -->
+
+        <!-- Grid column -->
+        <div class="col-md-2 col-lg-2 col-xl-2 mx-auto mb-4">
+          <!-- Links -->
+          <h6 class="text-uppercase fw-bold mb-4"><pre><pre></pre></pre><pre></pre>
+              |&nbsp;Products&nbsp;|
+          </h6>
+          <p>
+            <a href="#!" class="text-reset">Angular</a>
+          </p>
+          <p>
+            <a href="#!" class="text-reset">React</a>
+          </p>
+          <p>
+            <a href="#!" class="text-reset">Vue</a>
+          </p>
+          <p>
+            <a href="#!" class="text-reset">Laravel</a>
+          </p>
+        </div>
+        <!-- Grid column -->
+
+        <!-- Grid column -->
+        <div class="col-md-3 col-lg-2 col-xl-2 mx-auto mb-4">
+          <!-- Links -->
+          <h6 class="text-uppercase fw-bold mb-4"><pre><pre></pre></pre><pre></pre>
+              |&nbsp;Useful links&nbsp;|
+          </h6>
+          <p>
+            <a href="#!" class="text-reset">Pricing</a>
+          </p>
+          <p>
+            <a href="#!" class="text-reset">Settings</a>
+          </p>
+          <p>
+            <a href="#!" class="text-reset">Orders</a>
+          </p>
+          <p>
+            <a href="#!" class="text-reset">Help</a>
+          </p>
+        </div>
+        <!-- Grid column -->
+
+        <!-- Grid column -->
+        <div class="col-md-4 col-lg-3 col-xl-3 mx-auto mb-md-0 mb-4">
+          <!-- Links -->
+          <h6 class="text-uppercase fw-bold mb-4"><pre></pre><pre></pre><pre></pre>
+              |&nbsp; Contact&nbsp;|</h6>
+          <p><i class="fas fa-home me-3"></i> New York, NY 10012, US</p>
+          <p>
+            <i class="fas fa-envelope me-3"></i>
+            info@example.com
+          </p>
+          <p><i class="fas fa-phone me-3"></i> + 01 234 567 88</p>
+          <p><i class="fas fa-print me-3"></i> + 01 234 567 89</p>
+        </div>
+        <!-- Grid column -->
+      </div>
+      <!-- Grid row -->
+    </div>
+  </section>  
+  <!-- Section: Links  -->
+
+  <!-- Copyright -->
+  <div class="text-center p-4 copyright" style="background-color: rgba(0, 51, 66, 0.87);">
+    &copy;2024_All Rights Reserved by_
+      <a href="https://fahad1078.blogspot.com/">FAHAD ALI</a>
+  </div>
+  <!-- Copyright -->
+</footer>
+<!-- Footer -->
+
+     
+  <script src="{% static 'js/jquery-3.4.1.min.js' %}"></script>
+  <script src="{% static 'js/bootstrap.js' %}"></script>
+  <script src="{% static 'js/script_of_form.js' %}"></script>
+  <script>
+    function showPassword() {
+  var x = document.getElementById("Example");
+  if (x.type === "password") {
+    x.type = "text";
+
+  } else {
+    x.type = "password";
+  }
+}
+</script>
+</body>
+
+</html>

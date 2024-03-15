@@ -1,0 +1,190 @@
+
+/* buttons */
+
+.site-btn {
+	display: inline-block;
+	border: none;
+	font-size: 18px;
+	font-weight: 700;
+	min-width: 228px;
+	padding: 20px 40px;
+	background: #FF2953;
+	color: #ffffff;
+	line-height: normal;
+	cursor: pointer;
+	text-align: center;
+}
+
+.site-btn:hover {
+	color: #d1d1d1;
+}
+
+
+/* ----------------
+BMI section
+ ---------------------*/
+
+.bmi-section {
+	background: #f6f9fa;
+	position: relative;
+}
+
+.bmi-bg {
+	position: absolute;
+	height: 100%;
+	width: 40.5%;
+	left: 0;
+	top: 0;
+}
+
+.bmi-calculator-warp {
+	background: #202020;
+	padding: 48px 53px 40px;
+	margin-top: 70px;
+}
+
+.bmi-calculator input {
+	font-size: 16px;
+	color: #505050;
+}
+
+.bmi-calculator input,
+.bmi-calculator .site-btn {
+	width: 100%;
+	height: 57px;
+	margin-bottom: 30px;
+	padding: 0 24px;
+	border: none;
+	min-width: 100%;
+}
+
+.bmi-calculator p {
+	color: #fff;
+	font-style: italic;
+	margin-bottom: 0;
+	padding-top: 9px;
+}
+
+/* ----------------
+Responsive
+ ---------------------*/
+
+@media (min-width: 1200px) {
+	.container {
+		max-width: 1176px;
+	}
+}
+
+/* Medium screen : 992px. */
+
+@media only screen and (min-width: 992px) and (max-width: 1199px) {
+	.main-menu li a {
+		margin-right: 10px;
+	}
+	.header-right .hr-box {
+		width: 240px;
+		padding: 31px 20px;
+	}
+	.hero-text h2 {
+		font-size: 80px;
+	}
+	.add-text {
+		padding-left: 0;
+	}
+	.section-title h2 {
+		font-size: 43px;
+	}
+	.newsletter-form {
+		margin-left: 0;
+	}
+	.footer-widget .social-links a {
+		margin-left: 15px;
+	}
+	.add-text h2 {
+		margin-right: 100px;
+	}
+}
+
+/* Tablet :768px. */
+
+@media only screen and (min-width: 768px) and (max-width: 991px) {
+	.site-logo {
+		max-width: 165px;
+		padding: 15px 15px;
+	}
+	.main-menu li a {
+		margin-right: 5px;
+		font-size: 18px;
+		padding: 5px;
+	}
+	.header-right .hr-box {
+		width: 205px;
+		padding: 31px 10px;
+	}
+	.hero-text h2 {
+		font-size: 60px;
+	}
+	.bmi-bg {
+		display: none;
+	}
+	.newsletter-section {
+		text-align: center;
+	}
+	.newsletter-form {
+		margin-top: 50px;
+		margin-left: 0;
+	}
+	.footer-menu li a {
+		margin-left: 10px;
+	}
+	.about-img {
+		text-align: center;
+		margin-bottom: 40px;
+	}
+	.about-img img {
+		position: relative;
+		left: 0;
+		top: 0;
+	}
+	.certified-section {
+		background-position: right center;
+	}
+	.sidebar {
+		padding-top: 50px;
+	}
+}
+
+/* Large Mobile :480px. */
+
+@media only screen and (max-width: 767px) {
+	.site-logo {
+		padding-left: 15px;
+	}
+	.main-menu {
+		display: none;
+	}
+	
+	.bmi-bg {
+		display: none;
+	}
+	.bmi-calculator-warp {
+		padding: 48px 20px 40px;
+	}
+	
+}
+
+/* Small Mobile :320px. */
+
+@media only screen and (max-width: 479px) {
+	.section-title h2 {
+		font-size: 36px;
+	}
+	.hero-text h2,
+	.page-top-section h2 {
+		font-size: 48px;
+	}
+	.add-text h2 {
+		font-size: 36px;
+		margin-right: 0;
+	}
+}
