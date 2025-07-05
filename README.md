@@ -33,7 +33,24 @@
 
 ## 📸 Screenshots
 
-> *(Add some screenshots of the homepage, user dashboard, and admin panel here if possible)*
+### 🏠 Homepage
+
+![Homepage](screenshots/homepage.png)
+
+The homepage shows featured exercises and clean navigation for gym users.
+
+### 🙍‍♂️ User Panel
+
+![User Panel](screenshots/user.png)
+
+Users can view their assigned workout for the day, check their diet plan, and manage their profile settings.
+
+### 🛠️ Admin Panel
+
+![Admin Panel](screenshots/admin.png)
+
+Gym admins can add users, take attendance, and manage member data securely from the dashboard.
+
 
 ---
 
@@ -41,8 +58,8 @@
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/your-username/fitnesspro-django.git
-cd fitnesspro-django
+git clone https://github.com/FAHAD-ALI-github/FITNESSPRO_DJANGO.git
+cd FITNESSPRO_DJANGO
 
 # 2. Create virtual environment & activate
 python -m venv env
@@ -62,24 +79,20 @@ python manage.py createsuperuser
 python manage.py runserver
 ```
 
----
-
-## 🌐 Live Demo
-
-> 🔗 Coming Soon / [Add live link if deployed]
 
 ---
 
 ## 📂 Folder Structure
 
 ```
-fitnesspro-django/
+FITNESSPRO_DJANGO/
 │
-├── fitnesspro/          # Django project folder
-├── gymapp/              # Main app containing models, views, templates
-├── templates/           # HTML templates
-├── static/              # Static files (CSS, JS)
-├── db.sqlite3           # Database file
+├── FITNESSPRO/              # Django project folder
+├── gym/                     # Main app containing models, views, templates
+├── admin_images/            # Admin saved images
+├── users_profile_images/    # Users profile images
+├── screenshots/             # Project live demo screenshots
+├── db.sqlite3               # Database file
 ├── manage.py
 └── requirements.txt
 ```
@@ -96,4 +109,4 @@ fitnesspro-django/
 ## 📫 Contact
 
 Fahad Ali  
-[LinkedIn](https://www.linkedin.com/in/your-profile) • [GitHub](https://github.com/your-username)
+[LinkedIn](https://www.linkedin.com/in/fahadali1078) • [GitHub](https://github.com/FAHAD-ALI-github)
