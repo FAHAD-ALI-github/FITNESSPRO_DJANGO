@@ -25,7 +25,7 @@
 ## 🛠️ Tech Stack
 
 - **Backend:** Django (Python)
-- **Database:** SQLite (or PostgreSQL)
+- **Database:** SQLite 
 - **Frontend:** Django Templates (HTML, CSS)
 - **Auth:** Django’s built-in auth system
 
