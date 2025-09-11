@@ -1,0 +1,32 @@
+# --- Python ---
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.sqlite3
+*.log
+
+# --- Virtual Environment ---
+venv/
+env/
+ENV/
+
+# --- Django Specific ---
+db.sqlite3
+media/
+staticfiles/
+
+# --- User Uploaded Files ---
+admin_images/
+users_profile_images/
+
+# --- IDE & Editor ---
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# --- System Files ---
+.DS_Store
+Thumbs.db
+
