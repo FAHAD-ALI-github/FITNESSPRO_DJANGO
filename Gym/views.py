@@ -3,6 +3,17 @@ from .models import *
 import datetime
 
 
+# Hardcoded admin credentials
+ADMIN_CREDENTIALS = {
+    'username': 'admin',
+    'password': 'admin123',
+    'first_name': 'Admin',
+    'last_name': 'User',
+    'email': 'admin@gym.com',
+    'phone_number': '1234567890'
+}
+
+
 def home(request):
     return render(request, "home.html")
 
@@ -170,27 +181,36 @@ def attendance(request):
 
 
 def admin_portal(request):
-    admin = Gym_admin.objects.get(id=request.session['admin_id'])
-    return render(request, 'admin_portal.html', {'admin': admin})
+    # Check if admin is logged in via session
+    if 'admin_logged_in' not in request.session:
+        return redirect('/admin_login')
+    
+    # Pass hardcoded admin data to template
+    admin_data = ADMIN_CREDENTIALS.copy()
+    return render(request, 'admin_portal.html', {'admin': admin_data})
 
 def change_admin_password(request):   
+    global ADMIN_CREDENTIALS
     data={}
-    msg=""  
-    id_= request.GET.get("a_id")
+    msg=""
+    
+    # Check if admin is logged in
+    if 'admin_logged_in' not in request.session:
+        return redirect('/admin_login')
+    
     if request.method=="GET":
-        admin=Gym_admin.objects.get(pk=id_)    
-        data["admin"]=admin
+        # Pass current admin data to template
+        data["admin"] = ADMIN_CREDENTIALS.copy()
         return render(request, 'change_admin_password.html', data)
+    
     if request.method=="POST":
-        admin_id=request.POST.get("admin_id")
-        n_password=request.POST.get("n_pass")
-        admin_data = Gym_admin.objects.get(id=admin_id)
-        admin_data.password=n_password
-        admin_data.save()
-        msg="Password Has Changed Successfully!"
+        new_password = request.POST.get("n_pass")
+        # Update the hardcoded password
+        ADMIN_CREDENTIALS['password'] = new_password
+        msg = "Password Has Changed Successfully!"
         data["msg"] = msg
+        data["admin"] = ADMIN_CREDENTIALS.copy()
         return render(request, 'change_admin_password.html', data)
-        
 
 
 def change_user_password(request):
@@ -215,27 +235,32 @@ def change_user_password(request):
 def admin_login(request):
     data={}
     if request.method=="POST":
-        username=request.POST.get("a_username")
-        password=request.POST.get("a_password")
-        admin_data=Gym_admin.get_admin_by_username(username)
-        error=""
-        if admin_data:
-            if admin_data.password==password:
-                data["admin"]=admin_data
-                return render(request, "admin_portal.html", data)
-            else:
-                error="Password is Incorrect !"
-                data["error"] = error
-                return render(request, 'admin_login.html', data)
+        username = request.POST.get("a_username")
+        password = request.POST.get("a_password")
+        error = ""
+        
+        # Check against hardcoded credentials
+        if username == ADMIN_CREDENTIALS['username'] and password == ADMIN_CREDENTIALS['password']:
+            # Set session to mark admin as logged in
+            request.session['admin_logged_in'] = True
+            request.session['admin_username'] = username
+            
+            data["admin"] = ADMIN_CREDENTIALS.copy()
+            return render(request, "admin_portal.html", data)
         else:
-            error="Incorrect Username or password !"
+            error = "Incorrect Username or password!"
             data["error"] = error
             return render(request, 'admin_login.html', data)
     else:
         return render(request, 'admin_login.html', data)
-    
 
-
+def admin_logout(request):
+    # Clear admin session
+    if 'admin_logged_in' in request.session:
+        del request.session['admin_logged_in']
+    if 'admin_username' in request.session:
+        del request.session['admin_username']
+    return redirect('/')
 
 
 def delete_user(request):
@@ -243,6 +268,7 @@ def delete_user(request):
     user_=Gym_user.objects.get(id=user_id)
     user_.delete()
     return redirect("/all_members")
+
 def delete_profbyuser(request):
     user_id=request.GET.get("u_id")
     user_=Gym_user.objects.get(id=user_id)
@@ -393,5 +419,3 @@ def searchPage(request):
     data = {}
     data["members"] = searchedMember
     return render(request, 'searchPage.html', data)
-    
-

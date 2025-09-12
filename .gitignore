@@ -30,3 +30,7 @@ users_profile_images/
 .DS_Store
 Thumbs.db
 
+# --- Deployment Files ---
+PYTHONANYWHERE_DEPLOYMENT_GUIDE.md
+pythonanywhere_wsgi.py
+

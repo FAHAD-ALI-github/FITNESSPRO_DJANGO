@@ -99,32 +99,3 @@ class Gym_user(models.Model):
         except Gym_user.DoesNotExist:
             comment = None
         return comment
-    
-
-class Gym_admin(models.Model):
-
-    first_name = models.CharField(max_length=50)
-    last_name  = models.CharField(max_length=50)
-    dob = models.DateField()
-    phone_number = models.IntegerField()
-    address = models.ForeignKey(Address, on_delete=models.CASCADE)
-    image = models.ImageField(upload_to="admin_images/", default="images/find_user.png")
-    date_of_joining = models.DateTimeField(auto_now_add=True)
-    email = models.CharField(max_length=100)
-    username = models.CharField(max_length=150, unique=True)
-    password = models.CharField(max_length=100)
-
-    def __str__(self):
-        return self.first_name +" "+ self.last_name +"--Admin "
-    
-    @staticmethod
-    def get_admin_by_username(admin):
-        try:
-            comment = Gym_admin.objects.get(username=admin)
-        except Gym_admin.DoesNotExist:
-            comment = None
-        return comment
-    
-    @staticmethod
-    def get_admin_by_id(admin_id):
-        return Gym_admin.objects.get(id=admin_id)

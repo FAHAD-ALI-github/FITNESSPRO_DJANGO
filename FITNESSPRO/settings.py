@@ -20,12 +20,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
+# For production, use environment variables or a separate settings file
 SECRET_KEY = 'django-insecure-186xzg1_rr0i5uez_c*inzu49ewxd23*-gx$n$p5e35mp%b=tn'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# Set to False when deploying to production
+DEBUG = False
 
-ALLOWED_HOSTS = []
+# Add your PythonAnywhere domain to allowed hosts
+ALLOWED_HOSTS = ['yourusername.pythonanywhere.com', 'localhost', '127.0.0.1']
 
 
 # Application definition
@@ -116,14 +119,19 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = 'static/'
-STATIC_ROOT = BASE_DIR
-
-# to add pictures from users
-MEDIA_URL = "media/"
-
 import os
-MEDIA_ROOT = os.path.join(BASE_DIR, '')
+
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# Additional locations of static files
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'Gym/static'),
+]
+
+# Media files (User uploads)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 

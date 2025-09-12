@@ -7,7 +7,7 @@
     <div class="row mb-4" data-aos="fade-up">
         <div class="col-12">
             <div class="welcome-header">
-                <h1 class="gradient-text mb-2">Welcome {{admin.first_name}} {{admin.last_name}}!</h1>
+                <h1 class="gradient-text mb-2">Welcome Admin!</h1>
                 <p class="text-secondary fs-5">Manage your fitness center operations from this dashboard</p>
             </div>
         </div>
@@ -65,7 +65,7 @@
 
         <!-- Change Password -->
         <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="400">
-            <a href="/change_admin_password?a_id={{admin.id}}" class="dashboard-card">
+            <a href="/change_admin_password" class="dashboard-card">
                 <div class="card-icon bg-purple">
                     <img src="{% static '/images/changepassword.png' %}" alt="Change Password" style="width: 30px; height: 30px;">
                 </div>
