@@ -1,224 +1,673 @@
+{% extends 'parent.html' %}
 {% load static %}
 
-<html lang="en">
+{% block title %}Admin Login - FitnessPro{% endblock %}
 
-<head>
-  
-  <meta charset="utf-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+{% block extra_css %}
+<style>
+    /* Admin Login Specific Styles */
+    .login-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 120px 0 80px;
+        background: 
+            radial-gradient(circle at 20% 20%, rgba(102, 126, 234, 0.1) 0%, transparent 50%),
+            radial-gradient(circle at 80% 80%, rgba(118, 75, 162, 0.1) 0%, transparent 50%),
+            var(--bg-primary);
+        position: relative;
+        overflow: hidden;
+    }
 
-  <title>Fitnesspro</title>
-  <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css" />
-  <link rel="stylesheet" type="text/css" href="{% static '/css/bootstrap.css' %}" />
-  <link href="https://fonts.googleapis.com/css?family=Poppins:400,600,700&display=swap" rel="stylesheet">
-  <link href="{% static '/css/loginpage_styling.css' %}" rel="stylesheet" />
-  <link href="{% static '/css/responsive.css' %}" rel="stylesheet" />
-  <!-- google-fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Agbalumo&family=Averia+Libre:wght@700&family=Dancing+Script:wght@700&family=Nova+Square&display=swap" rel="stylesheet">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Agbalumo&family=Averia+Libre:wght@700&family=Dancing+Script:wght@700&family=Nova+Square&display=swap" rel="stylesheet">
-</head>
+    .login-container::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.02'%3E%3Ccircle cx='7' cy='7' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        animation: float 20s ease-in-out infinite;
+    }
 
+    @keyframes float {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-20px) rotate(180deg); }
+    }
 
-<body>
+    .admin-login-card {
+        background: var(--bg-card);
+        backdrop-filter: var(--blur-md);
+        border: 1px solid var(--border-color);
+        border-radius: 2rem;
+        padding: 3rem;
+        box-shadow: var(--shadow-lg);
+        position: relative;
+        overflow: hidden;
+        max-width: 500px;
+        width: 100%;
+        margin: 0 auto;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
 
-  <div class="hero_area">
-    <!-- header section starts -->
-    <header class="header_section">
-      <div class="container-fluid">
-        <nav class="navbar navbar-expand-lg custom_nav-container ">
-          <a class="navbar-brand" href="/">
-            <span>
-                Fitnesspro
-            </span>
-          </a>
-          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-          </button>
+    .admin-login-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: var(--primary-gradient);
+        opacity: 0.8;
+    }
 
-          <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <div class="d-flex ml-auto flex-column flex-lg-row align-items-center">
-              <ul class="navbar-nav  ">
-                <li class="nav-item active">
-                  <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
-                </li>
-                <li class="nav-item ">
-                  <a class="nav-link" href="/login">My Profile </a>
-                </li>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="/admin_login">Admin</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="/contact"> Contact Us</a>
-                </li>
-              </ul>
-              
-              
-            </div>
-          </div>
-        </nav>
-      </div>
-    </header>
-    <!-- end header section -->
+    .admin-login-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-glow);
+        border-color: var(--border-hover);
+    }
 
+    .admin-header {
+        text-align: center;
+        margin-bottom: 2.5rem;
+        position: relative;
+    }
 
-<div class="formbold-main-wrapper" style="font-size: larger; color: rgb(255, 255, 255); margin-bottom: 90px; " >
-    <div class="formbold-form-wrapper">
-      
-      <form action="/admin_login" method="POST">
-        {% csrf_token %}
-        <br>
-      <center><h1>ADMIN LOGIN HERE!</h1></center>
-      <br>
-      {% if error %}
-         <div class="alert alert-danger" role="alert">
-         {{error}}
-       </div>
-         {% endif %}
-        <div class="form-outline mb-4">
-            <label class="form-label" for="form2Example1">Username:</label>
-          <input type="text" id="form2Example1" class="form-control" name="a_username"/>
-        </div>
-      
+    .admin-icon {
+        width: 80px;
+        height: 80px;
+        background: var(--primary-gradient);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        box-shadow: var(--shadow-md);
+        position: relative;
+        overflow: hidden;
+    }
 
-        <div class="form-outline mb-4">
-            <label class="form-label" for="Example">Password:</label>
-          <input type="password" id="Example" class="form-control" name="a_password"/>
-        </div>
-      
-        <!-- 2 column grid layout for inline styling -->
-        <div class="row mb-4">
-          <div class="col d-flex ">
-            <!-- Checkbox -->
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" id="form2Example31" onclick="showPassword()"  />
-              <label class="form-check-label" for="form2Example31" > Show password </label>
-            </div>
-          </div>
-      
-          
-        </div>
-      
-        <button type="submit" class="btn btn-danger btn-block mb-4">Log in</button>
-      
-      </form>
-     </div>
-    </div>
+    .admin-icon::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: conic-gradient(from 0deg, transparent, rgba(255,255,255,0.3), transparent);
+        animation: rotate 3s linear infinite;
+    }
 
+    .admin-icon i {
+        font-size: 2rem;
+        color: white;
+        position: relative;
+        z-index: 1;
+    }
 
-     <!-- Footer -->
- <footer class="text-center text-lg-start bg-body-tertiary text-muted ">
+    @keyframes rotate {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
 
-  <!-- Section: Links  -->
-  <section class="section_links">
-    <div class="container text-center text-md-start mt-5">
-      <!-- Grid row -->
-      <div class="row mt-3">
-        <!-- Grid column -->
-        <div class="col-md-3 col-lg-4 col-xl-3 mx-auto mb-4">
-          <!-- Content -->
-          <h6 class="text-uppercase fw-bold mb-4">
-            <i class="fas fa-gem me-3"></i><pre><pre></pre></pre><pre></pre>
-            |&nbsp;Company name&nbsp;|
-          </h6>
-          <p>
-            Here you can use rows and columns to organize your footer content. Lorem ipsum
-            dolor sit amet, consectetur adipisicing elit.
-          </p>
-        </div>
-        <!-- Grid column -->
+    .admin-title {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 2rem;
+        font-weight: 700;
+        background: var(--primary-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 0.5rem;
+        position: relative;
+    }
 
-        <!-- Grid column -->
-        <div class="col-md-2 col-lg-2 col-xl-2 mx-auto mb-4">
-          <!-- Links -->
-          <h6 class="text-uppercase fw-bold mb-4"><pre><pre></pre></pre><pre></pre>
-              |&nbsp;Products&nbsp;|
-          </h6>
-          <p>
-            <a href="#!" class="text-reset">Angular</a>
-          </p>
-          <p>
-            <a href="#!" class="text-reset">React</a>
-          </p>
-          <p>
-            <a href="#!" class="text-reset">Vue</a>
-          </p>
-          <p>
-            <a href="#!" class="text-reset">Laravel</a>
-          </p>
-        </div>
-        <!-- Grid column -->
+    .admin-subtitle {
+        color: var(--text-secondary);
+        font-size: 1rem;
+        font-weight: 400;
+        margin-bottom: 0;
+    }
 
-        <!-- Grid column -->
-        <div class="col-md-3 col-lg-2 col-xl-2 mx-auto mb-4">
-          <!-- Links -->
-          <h6 class="text-uppercase fw-bold mb-4"><pre><pre></pre></pre><pre></pre>
-              |&nbsp;Useful links&nbsp;|
-          </h6>
-          <p>
-            <a href="#!" class="text-reset">Pricing</a>
-          </p>
-          <p>
-            <a href="#!" class="text-reset">Settings</a>
-          </p>
-          <p>
-            <a href="#!" class="text-reset">Orders</a>
-          </p>
-          <p>
-            <a href="#!" class="text-reset">Help</a>
-          </p>
-        </div>
-        <!-- Grid column -->
+    .form-floating {
+        position: relative;
+        margin-bottom: 1.5rem;
+    }
 
-        <!-- Grid column -->
-        <div class="col-md-4 col-lg-3 col-xl-3 mx-auto mb-md-0 mb-4">
-          <!-- Links -->
-          <h6 class="text-uppercase fw-bold mb-4"><pre></pre><pre></pre><pre></pre>
-              |&nbsp; Contact&nbsp;|</h6>
-          <p><i class="fas fa-home me-3"></i> New York, NY 10012, US</p>
-          <p>
-            <i class="fas fa-envelope me-3"></i>
-            info@example.com
-          </p>
-          <p><i class="fas fa-phone me-3"></i> + 01 234 567 88</p>
-          <p><i class="fas fa-print me-3"></i> + 01 234 567 89</p>
-        </div>
-        <!-- Grid column -->
-      </div>
-      <!-- Grid row -->
-    </div>
-  </section>  
-  <!-- Section: Links  -->
+    .form-floating .form-control {
+        height: 60px;
+        padding: 1rem 1.25rem 0.5rem;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--border-color);
+        border-radius: 1rem;
+        color: var(--text-primary);
+        font-size: 1rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        z-index: 1;
+    }
 
-  <!-- Copyright -->
-  <div class="text-center p-4 copyright" style="background-color: rgba(0, 51, 66, 0.87);">
-    &copy;2024_All Rights Reserved by_
-      <a href="https://fahad1078.blogspot.com/">FAHAD ALI</a>
-  </div>
-  <!-- Copyright -->
-</footer>
-<!-- Footer -->
+    .form-floating .form-control:focus {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: var(--accent-primary);
+        box-shadow: 
+            0 0 0 3px rgba(102, 126, 234, 0.1),
+            inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        transform: translateY(-2px);
+    }
 
-     
-  <script src="{% static 'js/jquery-3.4.1.min.js' %}"></script>
-  <script src="{% static 'js/bootstrap.js' %}"></script>
-  <script src="{% static 'js/script_of_form.js' %}"></script>
-  <script>
-    function showPassword() {
-  var x = document.getElementById("Example");
-  if (x.type === "password") {
-    x.type = "text";
+    .form-floating .form-control::placeholder {
+        color: transparent;
+    }
 
-  } else {
-    x.type = "password";
-  }
+    .form-floating label {
+        position: absolute;
+        top: 50%;
+        left: 1.25rem;
+        transform: translateY(-50%);
+        color: var(--text-muted);
+        font-size: 1rem;
+        font-weight: 500;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        pointer-events: none;
+        z-index: 2;
+    }
+
+.form-floating .form-control:focus + label,
+.form-floating .form-control:not(:placeholder-shown) + label {
+    top: -1rem;   
+    font-size: 0.75rem;
+    color: var(--accent-primary);
+    transform: translateY(0);
 }
-</script>
-</body>
 
-</html>
+
+    .input-icon {
+        position: absolute;
+        right: 1.25rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-muted);
+        transition: all 0.3s ease;
+        z-index: 3;
+        cursor: pointer;
+    }
+
+    .form-floating .form-control:focus ~ .input-icon {
+        color: var(--accent-primary);
+    }
+
+    .show-password {
+        cursor: pointer;
+        user-select: none;
+    }
+
+    .show-password:hover {
+        color: var(--accent-primary);
+    }
+
+    .form-check {
+        margin: 1.5rem 0;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .form-check-input {
+        width: 1.25rem;
+        height: 1.25rem;
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 0.25rem;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .form-check-input:checked {
+        background: var(--primary-gradient);
+        border-color: var(--accent-primary);
+    }
+
+    .form-check-input:focus {
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .form-check-label {
+        color: var(--text-secondary);
+        font-weight: 500;
+        cursor: pointer;
+        user-select: none;
+        transition: color 0.3s ease;
+    }
+
+    .form-check-input:checked + .form-check-label {
+        color: var(--text-primary);
+    }
+
+    .btn-admin-login {
+        width: 100%;
+        height: 56px;
+        background: var(--primary-gradient);
+        border: none;
+        border-radius: 1rem;
+        color: white;
+        font-size: 1.1rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+        margin-top: 1rem;
+    }
+
+    .btn-admin-login::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        transition: left 0.5s;
+    }
+
+    .btn-admin-login:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-glow);
+        filter: brightness(1.1);
+    }
+
+    .btn-admin-login:hover::before {
+        left: 100%;
+    }
+
+    .btn-admin-login:active {
+        transform: translateY(-1px);
+    }
+
+    .alert {
+        background: rgba(255, 71, 87, 0.1);
+        border: 1px solid rgba(255, 71, 87, 0.3);
+        border-radius: 1rem;
+        color: #ff6b7a;
+        padding: 1rem 1.25rem;
+        margin-bottom: 1.5rem;
+        font-weight: 500;
+        backdrop-filter: var(--blur-sm);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .alert::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        background: var(--accent-danger);
+    }
+
+    .alert i {
+        margin-right: 0.5rem;
+        font-size: 1.1rem;
+    }
+
+    .back-to-home {
+        text-align: center;
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid var(--border-color);
+    }
+
+    .back-to-home a {
+        color: var(--text-secondary);
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .back-to-home a:hover {
+        color: var(--accent-primary);
+        transform: translateX(-5px);
+    }
+
+    /* Loading Animation */
+    .btn-loading {
+        position: relative;
+        color: transparent !important;
+    }
+
+    .btn-loading::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 20px;
+        height: 20px;
+        margin: -10px 0 0 -10px;
+        border: 2px solid transparent;
+        border-top: 2px solid white;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .login-container {
+            padding: 100px 1rem 60px;
+        }
+        
+        .admin-login-card {
+            padding: 2rem 1.5rem;
+            border-radius: 1.5rem;
+        }
+        
+        .admin-title {
+            font-size: 1.75rem;
+        }
+        
+        .admin-icon {
+            width: 70px;
+            height: 70px;
+            margin-bottom: 1rem;
+        }
+        
+        .admin-icon i {
+            font-size: 1.75rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .admin-login-card {
+            padding: 1.5rem 1rem;
+            margin: 0 0.5rem;
+        }
+        
+        .admin-title {
+            font-size: 1.5rem;
+        }
+    }
+
+    /* Focus visible for accessibility */
+    .form-control:focus-visible,
+    .btn-admin-login:focus-visible,
+    .form-check-input:focus-visible {
+        outline: 2px solid var(--accent-primary);
+        outline-offset: 2px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="login-container">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 col-md-8 col-sm-10">
+                <div class="admin-login-card" data-aos="fade-up" data-aos-duration="800">
+                    <!-- Admin Header -->
+                    <div class="admin-header">
+                        <div class="admin-icon">
+                            <i class="fas fa-user-shield"></i>
+                        </div>
+                        <h1 class="admin-title">Admin Access</h1>
+                        <p class="admin-subtitle">Secure login for administrators</p>
+                    </div>
+
+                    <!-- Error Alert -->
+                    {% if error %}
+                    <div class="alert" data-aos="shake" data-aos-duration="600">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        {{ error }}
+                    </div>
+                    {% endif %}
+
+                    <!-- Login Form -->
+                    <form action="/admin_login" method="POST" id="adminLoginForm">
+                        {% csrf_token %}
+                        
+                        <!-- Username Field -->
+                        <div class="form-floating" data-aos="fade-up" data-aos-delay="200">
+                            <input 
+                                type="text" 
+                                class="form-control" 
+                                id="username" 
+                                name="a_username" 
+                                placeholder="Username"
+                                required
+                                autocomplete="username"
+                            >
+                            <label for="username">Administrator Username</label>
+                            <i class="fas fa-user input-icon"></i>
+                        </div>
+
+                        <!-- Password Field -->
+                        <div class="form-floating" data-aos="fade-up" data-aos-delay="300">
+                            <input 
+                                type="password" 
+                                class="form-control" 
+                                id="password" 
+                                name="a_password" 
+                                placeholder="Password"
+                                required
+                                autocomplete="current-password"
+                            >
+                            <label for="password">Administrator Password</label>
+                            <i class="fas fa-eye input-icon show-password" id="togglePassword"></i>
+                        </div>
+
+                        <!-- Show Password Checkbox -->
+                        <div class="form-check" data-aos="fade-up" data-aos-delay="400">
+                            <input 
+                                class="form-check-input" 
+                                type="checkbox" 
+                                id="showPasswordCheck"
+                            >
+                            <label class="form-check-label" for="showPasswordCheck">
+                                Show password
+                            </label>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button 
+                            type="submit" 
+                            class="btn btn-admin-login" 
+                            id="loginButton"
+                            data-aos="fade-up" 
+                            data-aos-delay="500"
+                        >
+                            <i class="fas fa-sign-in-alt me-2"></i>
+                            Login to Dashboard
+                        </button>
+                    </form>
+
+                    <!-- Back to Home -->
+                    <div class="back-to-home" data-aos="fade-up" data-aos-delay="600">
+                        <a href="/">
+                            <i class="fas fa-arrow-left"></i>
+                            Back to Home
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const passwordField = document.getElementById('password');
+    const togglePassword = document.getElementById('togglePassword');
+    const showPasswordCheck = document.getElementById('showPasswordCheck');
+    const loginForm = document.getElementById('adminLoginForm');
+    const loginButton = document.getElementById('loginButton');
+
+    // Toggle password visibility with icon
+    togglePassword.addEventListener('click', function() {
+        const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordField.setAttribute('type', type);
+        
+        // Toggle icon
+        this.classList.toggle('fa-eye');
+        this.classList.toggle('fa-eye-slash');
+        
+        // Update checkbox
+        showPasswordCheck.checked = type === 'text';
+    });
+
+    // Toggle password visibility with checkbox
+    showPasswordCheck.addEventListener('change', function() {
+        const type = this.checked ? 'text' : 'password';
+        passwordField.setAttribute('type', type);
+        
+        // Toggle icon
+        togglePassword.classList.toggle('fa-eye', !this.checked);
+        togglePassword.classList.toggle('fa-eye-slash', this.checked);
+    });
+
+    // Form submission with loading state
+    loginForm.addEventListener('submit', function() {
+        loginButton.classList.add('btn-loading');
+        loginButton.disabled = true;
+        
+        // Re-enable after 3 seconds in case of issues
+        setTimeout(() => {
+            loginButton.classList.remove('btn-loading');
+            loginButton.disabled = false;
+        }, 3000);
+    });
+
+    // Input focus effects
+    const inputs = document.querySelectorAll('.form-control');
+    inputs.forEach(input => {
+        input.addEventListener('focus', function() {
+            this.parentElement.classList.add('focused');
+        });
+        
+        input.addEventListener('blur', function() {
+            if (!this.value) {
+                this.parentElement.classList.remove('focused');
+            }
+        });
+
+        // Check if input has value on page load
+        if (input.value) {
+            input.parentElement.classList.add('focused');
+        }
+    });
+
+    // Enhanced form validation
+    const username = document.getElementById('username');
+    const password = document.getElementById('password');
+
+    function validateForm() {
+        let isValid = true;
+        
+        // Username validation
+        if (username.value.trim().length < 3) {
+            setFieldError(username, 'Username must be at least 3 characters');
+            isValid = false;
+        } else {
+            clearFieldError(username);
+        }
+
+        // Password validation
+        if (password.value.length < 6) {
+            setFieldError(password, 'Password must be at least 6 characters');
+            isValid = false;
+        } else {
+            clearFieldError(password);
+        }
+
+        return isValid;
+    }
+
+    function setFieldError(field, message) {
+        field.classList.add('is-invalid');
+        
+        // Remove existing error message
+        const existingError = field.parentElement.querySelector('.invalid-feedback');
+        if (existingError) {
+            existingError.remove();
+        }
+
+        // Add new error message
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'invalid-feedback';
+        errorDiv.style.display = 'block';
+        errorDiv.style.color = 'var(--accent-danger)';
+        errorDiv.style.fontSize = '0.875rem';
+        errorDiv.style.marginTop = '0.5rem';
+        errorDiv.textContent = message;
+        field.parentElement.appendChild(errorDiv);
+    }
+
+    function clearFieldError(field) {
+        field.classList.remove('is-invalid');
+        const errorDiv = field.parentElement.querySelector('.invalid-feedback');
+        if (errorDiv) {
+            errorDiv.remove();
+        }
+    }
+
+    // Real-time validation
+    username.addEventListener('input', function() {
+        if (this.classList.contains('is-invalid')) {
+            clearFieldError(this);
+        }
+    });
+
+    password.addEventListener('input', function() {
+        if (this.classList.contains('is-invalid')) {
+            clearFieldError(this);
+        }
+    });
+
+    // Prevent multiple rapid submissions
+    let isSubmitting = false;
+    loginForm.addEventListener('submit', function(e) {
+        if (isSubmitting) {
+            e.preventDefault();
+            return;
+        }
+
+        if (!validateForm()) {
+            e.preventDefault();
+            return;
+        }
+
+        isSubmitting = true;
+        setTimeout(() => {
+            isSubmitting = false;
+        }, 2000);
+    });
+
+    // Add keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+        // Escape to focus on username
+        if (e.key === 'Escape') {
+            username.focus();
+        }
+        
+        // Enter to submit when form is ready
+        if (e.key === 'Enter' && document.activeElement.tagName !== 'BUTTON') {
+            if (validateForm()) {
+                loginForm.submit();
+            }
+        }
+    });
+
+    // Auto-focus username field
+    setTimeout(() => {
+        username.focus();
+    }, 500);
+});
+</script>
+{% endblock %}

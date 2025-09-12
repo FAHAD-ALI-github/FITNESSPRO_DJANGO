@@ -1,346 +1,1085 @@
+{% extends "parent.html" %}
 {% load static %}
 
-<html lang="en">
+{% block title %}Register - FitnessPro{% endblock %}
 
-<head>
-  
-  <meta charset="utf-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+{% block extra_css %}
+<style>
+    /* Registration Page Specific Styles */
+    .registration-section {
+        min-height: 100vh;
+        padding: 140px 0 80px;
+        background: radial-gradient(circle at 20% 80%, rgba(102, 126, 234, 0.08) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 20%, rgba(118, 75, 162, 0.08) 0%, transparent 50%),
+                    radial-gradient(circle at 40% 40%, rgba(255, 71, 87, 0.03) 0%, transparent 50%);
+        position: relative;
+        overflow: hidden;
+    }
 
-  <title>Fitnesspro</title>
-  <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css" />
-  <link rel="stylesheet" type="text/css" href="{% static '/css/bootstrap.css' %}" >
-  <link href="https://fonts.googleapis.com/css?family=Poppins:400,600,700&display=swap" rel="stylesheet">
-  <link href="{% static '/css/form_styling.css' %}" rel="stylesheet" />
-  <link href="{% static '/css/responsive.css' %}" rel="stylesheet" />
-  <!-- google-fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Agbalumo&family=Averia+Libre:wght@700&family=Dancing+Script:wght@700&family=Nova+Square&display=swap" rel="stylesheet">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Agbalumo&family=Averia+Libre:wght@700&family=Dancing+Script:wght@700&family=Nova+Square&display=swap" rel="stylesheet">
-</head>
+    .registration-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="8" height="8" patternUnits="userSpaceOnUse"><path d="M 8 0 L 0 0 0 8" fill="none" stroke="rgba(255,255,255,0.02)" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+        opacity: 0.7;
+        pointer-events: none;
+    }
 
-<body>
-  <div class="hero_area">
-    <!-- header section starts -->
-    <header class="header_section">
-      <div class="container-fluid">
-        <nav class="navbar navbar-expand-lg custom_nav-container ">
-          <a class="navbar-brand" href="/">
-            <span>
-                Fitnesspro
-            </span>
-          </a>
-          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-          </button>
+    .registration-container {
+        max-width: 700px;
+        width: 100%;
+        margin: 0 auto;
+        padding: 0 20px;
+        position: relative;
+        z-index: 2;
+    }
 
-          <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <div class="d-flex ml-auto flex-column flex-lg-row align-items-center">
-              <ul class="navbar-nav  ">
-                <li class="nav-item active">
-                  <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
-                </li>
-                <li class="nav-item ">
-                  <a class="nav-link" href="/login"> My Profile </a>
-                </li>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="/admin_login"> Admin</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="/contact"> Contact Us</a>
-                </li>
-              </ul>
-              
+    .registration-card {
+        background: var(--bg-card);
+        backdrop-filter: var(--blur-md);
+        border: 1px solid var(--border-color);
+        border-radius: 2rem;
+        padding: 3rem;
+        box-shadow: var(--shadow-lg);
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
 
+    .registration-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: var(--primary-gradient);
+        opacity: 0.8;
+    }
+
+    .registration-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .registration-header h1 {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 2.5rem;
+        font-weight: 700;
+        background: var(--primary-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 0.5rem;
+    }
+
+    .registration-header p {
+        color: var(--text-secondary);
+        font-size: 1.1rem;
+        margin: 0;
+    }
+
+    /* Multi-step Progress */
+    .step-progress {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 3rem;
+        position: relative;
+    }
+
+    .step-progress::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: var(--border-color);
+        z-index: 1;
+        transform: translateY(-50%);
+    }
+
+    .step-progress::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 0;
+        height: 2px;
+        background: var(--primary-gradient);
+        transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 2;
+        width: 0%;
+        transform: translateY(-50%);
+    }
+
+    .step-progress[data-step="1"]::after { width: 0%; }
+    .step-progress[data-step="2"]::after { width: 50%; }
+    .step-progress[data-step="3"]::after { width: 100%; }
+
+    .step-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+        z-index: 3;
+        min-width: 100px;
+    }
+
+    .step-circle {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--bg-secondary);
+        border: 2px solid var(--border-color);
+        color: var(--text-muted);
+        font-weight: 600;
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .step-item.active .step-circle {
+        background: var(--primary-gradient);
+        border-color: var(--accent-primary);
+        color: white;
+        box-shadow: var(--shadow-glow);
+        transform: scale(1.1);
+    }
+
+    .step-item.completed .step-circle {
+        background: var(--accent-success);
+        border-color: var(--accent-success);
+        color: white;
+    }
+
+    .step-title {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        font-weight: 500;
+        text-align: center;
+        transition: color 0.3s ease;
+    }
+
+    .step-item.active .step-title {
+        color: var(--accent-primary);
+        font-weight: 600;
+    }
+
+    /* Form Steps */
+    .form-step {
+        display: none;
+        animation: fadeIn 0.5s ease-in-out;
+    }
+
+    .form-step.active {
+        display: block;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .form-row {
+        display: flex;
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group {
+        flex: 1;
+        position: relative;
+    }
+
+    .form-label {
+        display: block;
+        color: var(--text-primary);
+        font-weight: 600;
+        font-size: 1rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-label i {
+        color: var(--accent-primary);
+        margin-right: 0.5rem;
+        width: 16px;
+    }
+
+    .form-control {
+        width: 100%;
+        height: 55px;
+        padding: 0 1.25rem;
+        background: var(--bg-secondary);
+        border: 2px solid var(--border-color);
+        border-radius: 1rem;
+        color: var(--text-primary);
+        font-size: 1rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .form-control:focus {
+        background: var(--bg-secondary);
+        border-color: var(--accent-primary);
+        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        color: var(--text-primary);
+        outline: none;
+    }
+
+    .form-control::placeholder {
+        color: var(--text-muted);
+    }
+
+    .form-control.is-valid {
+        border-color: var(--accent-success);
+        box-shadow: 0 0 0 4px rgba(46, 213, 115, 0.1);
+    }
+
+    .form-control.is-invalid {
+        border-color: var(--accent-danger);
+        box-shadow: 0 0 0 4px rgba(255, 71, 87, 0.1);
+    }
+
+    .invalid-feedback {
+        color: var(--accent-danger);
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+        display: none;
+    }
+
+    .form-control.is-invalid + .invalid-feedback {
+        display: block;
+    }
+
+    .custom-select {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%23667eea' d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 1rem center;
+        background-size: 16px;
+        padding-right: 3rem;
+        cursor: pointer;
+    }
+
+    /* Button Navigation */
+    .form-navigation {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid var(--border-color);
+    }
+
+    .btn-nav {
+        height: 50px;
+        padding: 0 2rem;
+        border-radius: 1rem;
+        font-weight: 600;
+        font-size: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: none;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .btn-back {
+        background: var(--bg-secondary);
+        color: var(--text-secondary);
+        border: 2px solid var(--border-color);
+        display: none;
+    }
+
+    .btn-back.show {
+        display: flex;
+    }
+
+    .btn-back:hover {
+        color: var(--text-primary);
+        border-color: var(--border-hover);
+        background: var(--bg-tertiary);
+        transform: translateY(-2px);
+    }
+
+    .btn-next {
+        background: var(--primary-gradient);
+        color: white;
+        margin-left: auto;
+    }
+
+    .btn-next::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        transition: left 0.5s;
+    }
+
+    .btn-next:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-glow);
+    }
+
+    .btn-next:hover::before {
+        left: 100%;
+    }
+
+    /* Form Check */
+    .form-check {
+        display: flex;
+        align-items: flex-start;
+        margin: 1.5rem 0;
+    }
+
+    .form-check-input {
+        width: 20px;
+        height: 20px;
+        border: 2px solid var(--border-color);
+        border-radius: 0.375rem;
+        background: var(--bg-secondary);
+        margin-right: 0.75rem;
+        margin-top: 0.125rem;
+        transition: all 0.3s ease;
+        flex-shrink: 0;
+    }
+
+    .form-check-input:checked {
+        background: var(--primary-gradient);
+        border-color: var(--accent-primary);
+    }
+
+    .form-check-input:focus {
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        outline: none;
+    }
+
+    .form-check-label {
+        color: var(--text-secondary);
+        font-size: 0.95rem;
+        cursor: pointer;
+        user-select: none;
+        line-height: 1.4;
+    }
+
+    .form-check-label a {
+        color: var(--accent-primary);
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .form-check-label a:hover {
+        color: var(--accent-secondary);
+        text-decoration: underline;
+    }
+
+    /* Alert Messages */
+    .alert {
+        border: none;
+        border-radius: 1rem;
+        padding: 1rem 1.25rem;
+        margin-bottom: 1.5rem;
+        font-weight: 500;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .alert::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+    }
+
+    .alert-danger {
+        background: rgba(255, 71, 87, 0.1);
+        color: var(--accent-danger);
+    }
+
+    .alert-danger::before {
+        background: var(--accent-danger);
+    }
+
+    .alert-success {
+        background: rgba(46, 213, 115, 0.1);
+        color: var(--accent-success);
+    }
+
+    .alert-success::before {
+        background: var(--accent-success);
+    }
+
+    .login-link {
+        text-align: center;
+        color: var(--text-secondary);
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid var(--border-color);
+    }
+
+    .login-link a {
+        color: var(--accent-primary);
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+
+    .login-link a::after {
+        content: '';
+        position: absolute;
+        width: 0;
+        height: 2px;
+        bottom: -2px;
+        left: 50%;
+        background: var(--primary-gradient);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        transform: translateX(-50%);
+    }
+
+    .login-link a:hover {
+        color: var(--accent-secondary);
+    }
+
+    .login-link a:hover::after {
+        width: 100%;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .registration-section {
+            padding: 120px 0 60px;
+        }
+
+        .registration-card {
+            padding: 2rem 1.5rem;
+        }
+
+        .registration-header h1 {
+            font-size: 2rem;
+        }
+
+        .form-row {
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .step-progress {
+            margin-bottom: 2rem;
+        }
+
+        .step-item {
+            min-width: 80px;
+        }
+
+        .step-circle {
+            width: 35px;
+            height: 35px;
+            font-size: 0.9rem;
+        }
+
+        .step-title {
+            font-size: 0.8rem;
+        }
+
+        .form-navigation {
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .btn-nav {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .registration-section {
+            padding: 100px 0 40px;
+        }
+
+        .registration-container {
+            padding: 0 15px;
+        }
+
+        .registration-card {
+            padding: 1.5rem;
+            border-radius: 1.5rem;
+        }
+
+        .registration-header h1 {
+            font-size: 1.75rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="registration-section">
+    <div class="container">
+        <div class="registration-container">
+            <div class="registration-card">
+                <div class="registration-header">
+                    <h1>Join FitnessPro</h1>
+                    <p>Start your transformation journey today</p>
+                </div>
+
+                <!-- Progress Steps -->
+                <div class="step-progress" id="stepProgress" data-step="1">
+                    <div class="step-item active" data-step="1">
+                        <div class="step-circle">1</div>
+                        <div class="step-title">Basic Info</div>
+                    </div>
+                    <div class="step-item" data-step="2">
+                        <div class="step-circle">2</div>
+                        <div class="step-title">Fitness Info</div>
+                    </div>
+                    <div class="step-item" data-step="3">
+                        <div class="step-circle">3</div>
+                        <div class="step-title">Account</div>
+                    </div>
+                </div>
+
+                <!-- Alert Messages -->
+                {% if error %}
+                <div class="alert alert-danger" role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i>{{ error }}
+                </div>
+                {% endif %}
+
+                {% if msg %}
+                <div class="alert alert-success" role="alert">
+                    <i class="fas fa-check-circle me-2"></i>{{ msg }}
+                </div>
+                {% endif %}
+
+                <form action="/new_registration" method="POST" id="registrationForm" novalidate>
+                    {% csrf_token %}
+                    
+                    <!-- Step 1: Basic Information -->
+                    <div class="form-step active" data-step="1">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="firstname" class="form-label">
+                                    <i class="fas fa-user"></i>First Name
+                                </label>
+                                <input 
+                                    type="text" 
+                                    class="form-control" 
+                                    id="firstname" 
+                                    name="firstname" 
+                                    placeholder="Enter your first name"
+                                    value="{{ first_name }}" 
+                                    required
+                                >
+                                <div class="invalid-feedback">Please enter your first name</div>
+                            </div>
+                            <div class="form-group">
+                                <label for="lastname" class="form-label">
+                                    <i class="fas fa-user"></i>Last Name
+                                </label>
+                                <input 
+                                    type="text" 
+                                    class="form-control" 
+                                    id="lastname" 
+                                    name="lastname" 
+                                    placeholder="Enter your last name"
+                                    value="{{ last_name }}" 
+                                    required
+                                >
+                                <div class="invalid-feedback">Please enter your last name</div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="dob" class="form-label">
+                                    <i class="fas fa-calendar"></i>Date of Birth
+                                </label>
+                                <input 
+                                    type="date" 
+                                    class="form-control" 
+                                    id="dob" 
+                                    name="dob" 
+                                    value="{{ dob }}" 
+                                    required
+                                >
+                                <div class="invalid-feedback">Please select your date of birth</div>
+                            </div>
+                            <div class="form-group">
+                                <label for="phone" class="form-label">
+                                    <i class="fas fa-phone"></i>Phone Number
+                                </label>
+                                <input 
+                                    type="tel" 
+                                    class="form-control" 
+                                    id="phone" 
+                                    name="phone_number" 
+                                    placeholder="0300-0000000"
+                                    value="{{ phone_number }}" 
+                                    required
+                                >
+                                <div class="invalid-feedback">Please enter a valid phone number</div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="height" class="form-label">
+                                    <i class="fas fa-ruler-vertical"></i>Height (cm)
+                                </label>
+                                <input 
+                                    type="number" 
+                                    class="form-control" 
+                                    id="height" 
+                                    name="height" 
+                                    placeholder="170"
+                                    min="100" 
+                                    max="250"
+                                    value="{{ height }}" 
+                                    required
+                                >
+                                <div class="invalid-feedback">Please enter a valid height (100-250 cm)</div>
+                            </div>
+                            <div class="form-group">
+                                <label for="weight" class="form-label">
+                                    <i class="fas fa-weight"></i>Weight (kg)
+                                </label>
+                                <input 
+                                    type="number" 
+                                    class="form-control" 
+                                    id="weight" 
+                                    name="weight" 
+                                    placeholder="70"
+                                    min="30" 
+                                    max="200"
+                                    value="{{ weight }}" 
+                                    required
+                                >
+                                <div class="invalid-feedback">Please enter a valid weight (30-200 kg)</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Fitness Information -->
+                    <div class="form-step" data-step="2">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="gender" class="form-label">
+                                    <i class="fas fa-venus-mars"></i>Gender
+                                </label>
+                                <select 
+                                    class="form-control custom-select" 
+                                    id="gender" 
+                                    name="gender" 
+                                    required
+                                >
+                                    <option value="">Select Gender</option>
+                                    <option value="male" {% if gender == 'male' %}selected{% endif %}>Male</option>
+                                    <option value="female" {% if gender == 'female' %}selected{% endif %}>Female</option>
+                                </select>
+                                <div class="invalid-feedback">Please select your gender</div>
+                            </div>
+                            <div class="form-group">
+                                <label for="muscle_strength" class="form-label">
+                                    <i class="fas fa-dumbbell"></i>Fitness Level
+                                </label>
+                                <select 
+                                    class="form-control custom-select" 
+                                    id="muscle_strength" 
+                                    name="muscle_strength" 
+                                    required
+                                >
+                                    <option value="">Select Level</option>
+                                    <option value="beginner" {% if muscle_strength == 'beginner' %}selected{% endif %}>Beginner</option>
+                                    <option value="intermediate" {% if muscle_strength == 'intermediate' %}selected{% endif %}>Intermediate</option>
+                                    <option value="advanced" {% if muscle_strength == 'advanced' %}selected{% endif %}>Advanced</option>
+                                </select>
+                                <div class="invalid-feedback">Please select your fitness level</div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="address" class="form-label">
+                                    <i class="fas fa-map-marker-alt"></i>Address Area
+                                </label>
+                                <select 
+                                    class="form-control custom-select" 
+                                    id="address" 
+                                    name="address" 
+                                    required
+                                >
+                                    <option value="">Select Area</option>
+                                    <option value="township" {% if address == 'township' %}selected{% endif %}>Township</option>
+                                    <option value="johr town" {% if address == 'johr town' %}selected{% endif %}>Johr Town</option>
+                                    <option value="model town" {% if address == 'model town' %}selected{% endif %}>Model Town</option>
+                                    <option value="faisal town" {% if address == 'faisal town' %}selected{% endif %}>Faisal Town</option>
+                                    <option value="green town" {% if address == 'green town' %}selected{% endif %}>Green Town</option>
+                                    <option value="iqbal town" {% if address == 'iqbal town' %}selected{% endif %}>Iqbal Town</option>
+                                    <option value="garden town" {% if address == 'garden town' %}selected{% endif %}>Garden Town</option>
+                                </select>
+                                <div class="invalid-feedback">Please select your address area</div>
+                            </div>
+                            <div class="form-group">
+                                <label for="gym_split" class="form-label">
+                                    <i class="fas fa-calendar-week"></i>Workout Plan
+                                </label>
+                                <select 
+                                    class="form-control custom-select" 
+                                    id="gym_split" 
+                                    name="gym_split" 
+                                    required
+                                >
+                                    <option value="">Select Plan</option>
+                                    <option value="5_day_split" {% if gym_split == '5_day_split' %}selected{% endif %}>5 Day Split</option>
+                                    <option value="3_day_split" {% if gym_split == '3_day_split' %}selected{% endif %}>3 Day Split (PPL)</option>
+                                </select>
+                                <div class="invalid-feedback">Please select a workout plan</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email" class="form-label">
+                                <i class="fas fa-envelope"></i>Email Address
+                            </label>
+                            <input 
+                                type="email" 
+                                class="form-control" 
+                                id="email" 
+                                name="email" 
+                                placeholder="your@email.com"
+                                value="{{ email }}" 
+                                required
+                            >
+                            <div class="invalid-feedback">Please enter a valid email address</div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Account Creation -->
+                    <div class="form-step" data-step="3">
+                        <div class="form-group">
+                            <label for="username" class="form-label">
+                                <i class="fas fa-user-circle"></i>Create Username
+                            </label>
+                            <input 
+                                type="text" 
+                                class="form-control" 
+                                id="username" 
+                                name="username" 
+                                placeholder="Choose a unique username"
+                                value="{{ username }}" 
+                                required
+                                minlength="3"
+                            >
+                            <div class="invalid-feedback">Username must be at least 3 characters long</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="password" class="form-label">
+                                <i class="fas fa-lock"></i>Create Password
+                            </label>
+                            <input 
+                                type="password" 
+                                class="form-control" 
+                                id="password" 
+                                name="password" 
+                                placeholder="Create a strong password"
+                                value="{{ password }}" 
+                                required
+                                minlength="6"
+                            >
+                            <div class="invalid-feedback">Password must be at least 6 characters long</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="c_password" class="form-label">
+                                <i class="fas fa-lock"></i>Confirm Password
+                            </label>
+                            <input 
+                                type="password" 
+                                class="form-control" 
+                                id="c_password" 
+                                name="c_password" 
+                                placeholder="Confirm your password"
+                                required
+                                minlength="6"
+                            >
+                            <div class="invalid-feedback">Passwords do not match</div>
+                        </div>
+
+                        <div class="form-check">
+                            <input 
+                                class="form-check-input" 
+                                type="checkbox" 
+                                id="terms" 
+                                required
+                            >
+                            <label class="form-check-label" for="terms">
+                                I agree to the <a href="#" onclick="return false;">Terms & Conditions</a> and <a href="#" onclick="return false;">Privacy Policy</a>
+                            </label>
+                            <div class="invalid-feedback">Please agree to the terms and conditions</div>
+                        </div>
+                    </div>
+
+                    <!-- Navigation Buttons -->
+                    <div class="form-navigation">
+                        <button type="button" class="btn-nav btn-back" id="prevBtn">
+                            <i class="fas fa-arrow-left me-2"></i>Back
+                        </button>
+                        <button type="button" class="btn-nav btn-next" id="nextBtn">
+                            Next<i class="fas fa-arrow-right ms-2"></i>
+                        </button>
+                    </div>
+                </form>
+
+                <div class="login-link">
+                    <p>Already have an account? <a href="/login">Sign in here</a></p>
+                </div>
             </div>
-          </div>
-        </nav>
-      </div>
-    </header>
-    <!-- end header section -->
+        </div>
+    </div>
+</section>
+{% endblock %}
 
-  <div class="formbold-main-wrapper" >
-    <div class="formbold-form-wrapper">
-      <form action="/new_registration" method="post">
-        {% csrf_token %}
-        
-        <div class="formbold-steps">
-              <ul>
-                  <li class="formbold-step-menu1 active">
-                      <span>1</span>
-                      Basic Info
-                  </li>
-                  <li class="formbold-step-menu2">
-                      <span>2</span>
-                      Gym info
-                  </li>
-                  <li class="formbold-step-menu3">
-                      <span>3</span>
-                      Sign Up
-                  </li>
-                  
-              </ul>
-          </div>
-  
-          <div class="formbold-form-step-1 active">
-            {% if error %}
-         <div class="alert alert-danger" role="alert">
-         {{error}}
-       </div>
-         {% endif %}
-         {% if msg %}
-         <div class="alert alert-success" role="alert">
-         {{msg}}
-       </div>
-         {% endif %}
-            <div class="formbold-input-flex">
-              
-              <div>
-                  <label for="u_firstname" class="formbold-form-label"> First name </label>
-                  <input
-                  type="text"
-                  name="firstname"
-                  placeholder="First name"
-                  id="u_firstname"
-                  class="formbold-form-input"
-                  value="{{first_name}}" required
-                  />
-              </div>
-              <div>
-                  <label for="u_lastname" class="formbold-form-label" > Last name </label>
-                  <input
-                  type="text"
-                  name="lastname"
-                  placeholder="Last name"
-                  id="u_lastname"
-                  class="formbold-form-input"
-                  value="{{last_name}}" required
-                  />
-              </div>
-            </div>
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('registrationForm');
+    const nextBtn = document.getElementById('nextBtn');
+    const prevBtn = document.getElementById('prevBtn');
+    const stepProgress = document.getElementById('stepProgress');
+    const formSteps = document.querySelectorAll('.form-step');
+    const stepItems = document.querySelectorAll('.step-item');
     
-            <div class="formbold-input-flex">
-                <div>
-                    <label for="u_dob" class="formbold-form-label"> Date of Birth </label>
-                    <input 
-                    type="date" 
-                    name="dob" 
-                    id="u_dob" 
-                    class="formbold-form-input"
-                    value="{{dob}}" required
-                    />
-                </div>
-                <div>
-                    <label for="phone" class="formbold-form-label" >Phone Number</label>
-                    <input type="tel" id="phone" name="phone_number" placeholder="0300-0000000" class="formbold-form-input" value="{{phone_number}}" required>
-                </div>
-            </div>
-            <div class="formbold-input-flex">
-                <div>
-                    <label for="u_height" class="formbold-form-label">Height (in cm)</label>
-                    <input type="number" id="u_height" name="height" min="0" max="500" class="formbold-form-input" value="{{height}}" required>
-                </div>
-                <div>
-                    <label for="u_Weight" class="formbold-form-label">Weight (in kg)</label>
-                    <input type="number" id="u_Weight" name="weight" min="0" max="500" class="formbold-form-input" value="{{weight}}" required>
-                </div>
-              </div>
-          
-          </div>
-  
-          <div class="formbold-form-step-2">
-            {% if error %}
-         <div class="alert alert-danger" role="alert">
-         {{error}}
-       </div>
-         {% endif %}
- 
-                <label for="u_musclestrength" class="form-control"><center>Muscle strength : &nbsp;&nbsp;
-                  <select id="u_musclestrength" name="muscle_strength" required>
-                    <option value="beginner">Beginner</option>
-                    <option value="intermediate">Intermediate</option>
-                    <option value="advanced">Advanced</option>
-                </select></center>
-                </label>
-                
-              
-              <label for="u_gender" class="form-control"><center>Gender : &nbsp;&nbsp; 
-                <select id="u_gender" name="gender" required>
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
-              </select></center>
-              </label>
-              
+    let currentStep = 1;
+    const totalSteps = 3;
+
+    // Initialize
+    updateStepDisplay();
+
+    // Next button functionality
+    nextBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        if (validateCurrentStep()) {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                updateStepDisplay();
+            } else {
+                // Submit form on last step
+                if (validateFinalStep()) {
+                    form.submit();
+                }
+            }
+        }
+    });
+
+    // Previous button functionality
+    prevBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        if (currentStep > 1) {
+            currentStep--;
+            updateStepDisplay();
+        }
+    });
+
+    function updateStepDisplay() {
+        // Update form steps visibility
+        formSteps.forEach((step, index) => {
+            step.classList.toggle('active', index + 1 === currentStep);
+        });
+
+        // Update progress indicators
+        stepItems.forEach((item, index) => {
+            item.classList.remove('active', 'completed');
             
-          
-            <label for="u_address" class="form-control"><center>Address area : &nbsp;&nbsp; 
-              <select id="u_address" name="address" required>
-                <option value="township">Township</option>
-                <option value="johr town">Johr town</option>
-                <option value="model town">Model town</option>
-                <option value="faisal town">Faisal town</option>
-                <option value="green town">Green town</option>
-                <option value="iqbal town">Iqbal town</option>
-                <option value="garden town">Garden town</option>
-            </select></center>
-            </label>
-              
+            if (index + 1 === currentStep) {
+                item.classList.add('active');
+            } else if (index + 1 < currentStep) {
+                item.classList.add('completed');
+                item.querySelector('.step-circle').innerHTML = '<i class="fas fa-check"></i>';
+            } else {
+                item.querySelector('.step-circle').innerHTML = index + 1;
+            }
+        });
 
-            <pre></pre>
-            <label for="u_gym_split" class="form-control  mb-4"><center >gym_split : &nbsp;
-              <select id="u_gym_split" name="gym_split" required>
-              <option value="5_day_split">5 day split (Chest-back-shoulder-Biceps,triceps-legs)</option>
-              <option value="3_day_split">3 day split (Push-Pull-Legs)</option>
-          </select></center></label>
-              
-          <label for="u_email" class="formbold-form-label"> Email Address :</label>
-          <input type="email" id="u_email" name="email" min="0" max="500" class="formbold-form-input mb-2" placeholder="email@gmail.com" value="{{email}}">
+        // Update progress bar
+        stepProgress.setAttribute('data-step', currentStep);
 
+        // Update navigation buttons
+        prevBtn.classList.toggle('show', currentStep > 1);
+        
+        if (currentStep === totalSteps) {
+            nextBtn.innerHTML = '<i class="fas fa-user-plus me-2"></i>Create Account';
+        } else {
+            nextBtn.innerHTML = 'Next<i class="fas fa-arrow-right ms-2"></i>';
+        }
+    }
 
-          </div>
+    function validateCurrentStep() {
+        const currentFormStep = document.querySelector('.form-step.active');
+        const requiredFields = currentFormStep.querySelectorAll('input[required], select[required]');
+        let isValid = true;
 
-
-
-          <div class="formbold-form-step-3">
-            {% if error %}
-         <div class="alert alert-danger" role="alert">
-         {{error}}
-       </div>
-         {% endif %}
+        requiredFields.forEach(field => {
+            // Remove previous validation classes
+            field.classList.remove('is-valid', 'is-invalid');
             
-            <label for="u_username" class="formbold-form-label"> Create Username </label>
-            <input type="text" id="u_username" name="username"  min="0" max="500" class="formbold-form-input" value="{{username}}" placeholder="Create Username" required>
+            // Check if field is valid
+            if (!field.checkValidity() || !field.value.trim()) {
+                field.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                field.classList.add('is-valid');
+            }
+        });
+
+        // Special validation for step 2 - email format
+        if (currentStep === 2) {
+            const emailField = document.getElementById('email');
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             
+            if (emailField.value && !emailPattern.test(emailField.value)) {
+                emailField.classList.remove('is-valid');
+                emailField.classList.add('is-invalid');
+                isValid = false;
+            }
+        }
 
-<br><br>
+        // Scroll to first invalid field if any
+        if (!isValid) {
+            const firstInvalid = currentFormStep.querySelector('.is-invalid');
+            if (firstInvalid) {
+                firstInvalid.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'center'
+                });
+                firstInvalid.focus();
+            }
+        }
 
-            <label for="u_password" class="formbold-form-label"> Create Password </label>
-            <input type="text" id="u_password" name="password" min="0" max="50" class="formbold-form-input" placeholder="Create Password" value="{{password}}" required>
-            <br><br>
+        return isValid;
+    }
 
-            <label for="c_password" class="formbold-form-label"> Confirm Password </label>
-            <input type="text" id="c_password" name="c_password" min="0" max="50" class="formbold-form-input" placeholder="Confirm Password" required>
-            <br>
-            
-          </div>
-  
-          <div class="formbold-form-btn-wrapper">
-            <button class="formbold-back-btn" >
-              Back
-            </button>
-  
-            <button class="formbold-btn">
-                Next Step
-            </button>
-          </div>
-      </form>
-    </div>
-  </div>
+    function validateFinalStep() {
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('c_password').value;
+        const terms = document.getElementById('terms').checked;
+        const passwordField = document.getElementById('c_password');
+        const termsField = document.getElementById('terms');
+        
+        let isValid = true;
 
- <!-- Footer -->
- <footer class="text-center text-lg-start bg-body-tertiary text-muted ">
+        // Password match validation
+        if (password !== confirmPassword) {
+            passwordField.classList.remove('is-valid');
+            passwordField.classList.add('is-invalid');
+            isValid = false;
+        } else if (confirmPassword) {
+            passwordField.classList.remove('is-invalid');
+            passwordField.classList.add('is-valid');
+        }
 
-  <!-- Section: Links  -->
-  <section class="section_links">
-    <div class="container text-center text-md-start mt-5">
-      <!-- Grid row -->
-      <div class="row mt-3">
-        <!-- Grid column -->
-        <div class="col-md-3 col-lg-4 col-xl-3 mx-auto mb-4">
-          <!-- Content -->
-          <h6 class="text-uppercase fw-bold mb-4">
-            <i class="fas fa-gem me-3"></i><pre><pre></pre></pre><pre></pre>
-            |&nbsp;Company name&nbsp;|
-          </h6>
-          <p>
-            Here you can use rows and columns to organize your footer content. Lorem ipsum
-            dolor sit amet, consectetur adipisicing elit.
-          </p>
-        </div>
-        <!-- Grid column -->
+        // Terms validation
+        if (!terms) {
+            // Visual indication for terms checkbox
+            const termsLabel = document.querySelector('label[for="terms"]');
+            termsLabel.style.color = 'var(--accent-danger)';
+            isValid = false;
+        } else {
+            const termsLabel = document.querySelector('label[for="terms"]');
+            termsLabel.style.color = '';
+        }
 
-        <!-- Grid column -->
-        <div class="col-md-2 col-lg-2 col-xl-2 mx-auto mb-4">
-          <!-- Links -->
-          <h6 class="text-uppercase fw-bold mb-4"><pre><pre></pre></pre><pre></pre>
-              |&nbsp;Products&nbsp;|
-          </h6>
-          <p>
-            <a href="#!" class="text-reset">Angular</a>
-          </p>
-          <p>
-            <a href="#!" class="text-reset">React</a>
-          </p>
-          <p>
-            <a href="#!" class="text-reset">Vue</a>
-          </p>
-          <p>
-            <a href="#!" class="text-reset">Laravel</a>
-          </p>
-        </div>
-        <!-- Grid column -->
+        return isValid;
+    }
 
-        <!-- Grid column -->
-        <div class="col-md-3 col-lg-2 col-xl-2 mx-auto mb-4">
-          <!-- Links -->
-          <h6 class="text-uppercase fw-bold mb-4"><pre><pre></pre></pre><pre></pre>
-              |&nbsp;Useful links&nbsp;|
-          </h6>
-          <p>
-            <a href="#!" class="text-reset">Pricing</a>
-          </p>
-          <p>
-            <a href="#!" class="text-reset">Settings</a>
-          </p>
-          <p>
-            <a href="#!" class="text-reset">Orders</a>
-          </p>
-          <p>
-            <a href="#!" class="text-reset">Help</a>
-          </p>
-        </div>
-        <!-- Grid column -->
+    // Real-time validation for all inputs
+    form.addEventListener('input', function(e) {
+        const field = e.target;
+        
+        if (field.hasAttribute('required')) {
+            // Remove error styling when user starts typing
+            field.classList.remove('is-invalid');
 
-        <!-- Grid column -->
-        <div class="col-md-4 col-lg-3 col-xl-3 mx-auto mb-md-0 mb-4">
-          <!-- Links -->
-          <h6 class="text-uppercase fw-bold mb-4"><pre></pre><pre></pre><pre></pre>
-              |&nbsp; Contact&nbsp;|</h6>
-          <p><i class="fas fa-home me-3"></i> New York, NY 10012, US</p>
-          <p>
-            <i class="fas fa-envelope me-3"></i>
-            info@example.com
-          </p>
-          <p><i class="fas fa-phone me-3"></i> + 01 234 567 88</p>
-          <p><i class="fas fa-print me-3"></i> + 01 234 567 89</p>
-        </div>
-        <!-- Grid column -->
-      </div>
-      <!-- Grid row -->
-    </div>
-  </section>  
-  <!-- Section: Links  -->
+            // Add success styling for valid fields
+            if (field.checkValidity() && field.value.trim()) {
+                field.classList.add('is-valid');
+            } else {
+                field.classList.remove('is-valid');
+            }
+        }
+    });
 
-  <!-- Copyright -->
-  <div class="text-center p-4 copyright" style="background-color: rgba(0, 0, 0, 0.123);">
-    &copy;2024_All Rights Reserved by_
-      <a href="https://fahad1078.blogspot.com/">FAHAD ALI</a>
-  </div>
-  <!-- Copyright -->
-</footer>
-<!-- Footer -->
+    // Password confirmation real-time validation
+    document.getElementById('c_password').addEventListener('input', function() {
+        const password = document.getElementById('password').value;
+        const confirmPassword = this.value;
+        
+        this.classList.remove('is-invalid');
 
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
-  <script src="{% static 'js/jquery-3.4.1.min.js' %}"></script>
-  <script src="{% static 'js/bootstrap.js' %}"></script>
-  <script src="{% static 'js/script_of_form.js' %}"></script>
+        if (confirmPassword && password === confirmPassword) {
+            this.classList.add('is-valid');
+        } else if (confirmPassword) {
+            this.classList.remove('is-valid');
+        }
+    });
 
-</body>
+    // Terms checkbox styling fix
+    document.getElementById('terms').addEventListener('change', function() {
+        const termsLabel = document.querySelector('label[for="terms"]');
+        termsLabel.style.color = '';
+    });
 
-</html>
+    // Prevent form submission on Enter key except on last step
+    form.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && currentStep < totalSteps) {
+            e.preventDefault();
+            nextBtn.click();
+        }
+    });
+
+    // Age validation for date of birth
+    document.getElementById('dob').addEventListener('change', function() {
+        const birthDate = new Date(this.value);
+        const today = new Date();
+        const age = today.getFullYear() - birthDate.getFullYear();
+        const monthDiff = today.getMonth() - birthDate.getMonth();
+        
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+            age--;
+        }
+        
+        if (age < 13 || age > 100) {
+            this.classList.add('is-invalid');
+            this.setCustomValidity('Age must be between 13 and 100 years');
+        } else {
+            this.classList.remove('is-invalid');
+            this.setCustomValidity('');
+            if (this.value) {
+                this.classList.add('is-valid');
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

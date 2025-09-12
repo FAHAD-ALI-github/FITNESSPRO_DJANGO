@@ -1,70 +1,851 @@
-{% extends 'admin_base.html' %} {% load static %} {% block content %}
+{% extends 'admin_base.html' %}
+{% load static %}
+{% block content %}
 
-
-        <div id="page-wrapper" >
-            <div id="page-inner">
-                <div class="row">
-                    <div class="col-md-12">
-                     <h2>Attendance</h2>   
-                        
-                    </div>
-                </div> 
-                
-                          
-                 <!-- /. ROW  -->
-                  <pre></pre>
-                  {% if msg %}
-                  <div class="alert alert-success mx-3" role="alert">
-                  {{msg}}
-                  </div>
-                  <br><br>
-                  {% endif %}
-                  <!-- <br><br> -->
-           
-                  <center>
-                    <form method="post" action="/attendance"> 
-                      {% csrf_token %}
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                              <span class="input-group-text" id="inputGroup-sizing-default">id # </span>
-                            </div>
-                            <input type="number" value=0 class="form-control" aria-label="Default" name="1" aria-describedby="inputGroup-sizing-default">
-                          </div>
-                          <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                              <span class="input-group-text" id="inputGroup-sizing-default">id # </span>
-                            </div>
-                            <input type="number" value=0 class="form-control" aria-label="Default" name="2" aria-describedby="inputGroup-sizing-default">
-                          </div>
-                          <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                              <span class="input-group-text" id="inputGroup-sizing-default">id # </span>
-                            </div>
-                            <input type="number" value=0 class="form-control" aria-label="Default" name="3" aria-describedby="inputGroup-sizing-default">
-                          </div>
-                          <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                              <span class="input-group-text" id="inputGroup-sizing-default">id # </span>
-                            </div>
-                            <input type="number" value=0 class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default" name="4">
-                          </div>
-                          <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                              <span class="input-group-text" id="inputGroup-sizing-default">id # </span>
-                            </div>
-                            <input type="number" value=0 class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default" name="5">
-                          </div>
-        <br><br>
-                        <button type="submit" class="btn btn-primary">Take Attendance (Mark as present) </button>
-                      </form>
-                  </center>
-
-
-                  
-                                
-
-
-			
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="row mb-4" data-aos="fade-up">
+        <div class="col-12">
+            <div class="page-header glass-card p-4 text-center">
+                <i class="fas fa-clipboard-check fs-1 gradient-text mb-3"></i>
+                <h1 class="gradient-text mb-2">Take Attendance</h1>
+                <p class="text-secondary fs-5">Mark members as present by entering their ID numbers</p>
+                <div class="attendance-date mt-3">
+                    <span class="badge bg-primary">Today: <span id="currentDate"></span></span>
+                </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Success Message -->
+    {% if msg %}
+    <div class="row mb-4" data-aos="fade-up" data-aos-delay="100">
+        <div class="col-12">
+            <div class="alert alert-success alert-modern">
+                <div class="alert-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="alert-content">
+                    <h6>Success!</h6>
+                    <p class="mb-0">{{ msg }}</p>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Attendance Form -->
+    <div class="row justify-content-center" data-aos="fade-up" data-aos-delay="200">
+        <div class="col-lg-8 col-xl-6">
+            <div class="attendance-form-container glass-card p-5">
+                <form method="post" action="/attendance" class="attendance-form" id="attendanceForm">
+                    {% csrf_token %}
+                    
+                    <div class="form-header text-center mb-5">
+                        <h3 class="text-white mb-3">Member ID Entry</h3>
+                        <p class="text-secondary">Enter up to 5 member IDs to mark them as present</p>
+                        <div class="attendance-counter">
+                            <span id="memberCount">0</span> members will be marked present
+                        </div>
+                    </div>
+
+                    <div class="attendance-inputs">
+                        <!-- Member ID 1 -->
+                        <div class="input-group-modern mb-4" data-aos="fade-right" data-aos-delay="300">
+                            <div class="input-label">
+                                <i class="fas fa-user text-primary me-2"></i>
+                                <span>Member ID #1</span>
+                                <span class="member-preview" id="preview1"></span>
+                            </div>
+                            <div class="input-wrapper">
+                                <input type="number" value="0" class="form-control-modern" name="1" placeholder="Enter member ID" min="0" id="member1">
+                                <div class="input-status" id="status1"></div>
+                            </div>
+                        </div>
+
+                        <!-- Member ID 2 -->
+                        <div class="input-group-modern mb-4" data-aos="fade-right" data-aos-delay="400">
+                            <div class="input-label">
+                                <i class="fas fa-user text-primary me-2"></i>
+                                <span>Member ID #2</span>
+                                <span class="member-preview" id="preview2"></span>
+                            </div>
+                            <div class="input-wrapper">
+                                <input type="number" value="0" class="form-control-modern" name="2" placeholder="Enter member ID" min="0" id="member2">
+                                <div class="input-status" id="status2"></div>
+                            </div>
+                        </div>
+
+                        <!-- Member ID 3 -->
+                        <div class="input-group-modern mb-4" data-aos="fade-right" data-aos-delay="500">
+                            <div class="input-label">
+                                <i class="fas fa-user text-primary me-2"></i>
+                                <span>Member ID #3</span>
+                                <span class="member-preview" id="preview3"></span>
+                            </div>
+                            <div class="input-wrapper">
+                                <input type="number" value="0" class="form-control-modern" name="3" placeholder="Enter member ID" min="0" id="member3">
+                                <div class="input-status" id="status3"></div>
+                            </div>
+                        </div>
+
+                        <!-- Member ID 4 -->
+                        <div class="input-group-modern mb-4" data-aos="fade-right" data-aos-delay="600">
+                            <div class="input-label">
+                                <i class="fas fa-user text-primary me-2"></i>
+                                <span>Member ID #4</span>
+                                <span class="member-preview" id="preview4"></span>
+                            </div>
+                            <div class="input-wrapper">
+                                <input type="number" value="0" class="form-control-modern" name="4" placeholder="Enter member ID" min="0" id="member4">
+                                <div class="input-status" id="status4"></div>
+                            </div>
+                        </div>
+
+                        <!-- Member ID 5 -->
+                        <div class="input-group-modern mb-5" data-aos="fade-right" data-aos-delay="700">
+                            <div class="input-label">
+                                <i class="fas fa-user text-primary me-2"></i>
+                                <span>Member ID #5</span>
+                                <span class="member-preview" id="preview5"></span>
+                            </div>
+                            <div class="input-wrapper">
+                                <input type="number" value="0" class="form-control-modern" name="5" placeholder="Enter member ID" min="0" id="member5">
+                                <div class="input-status" id="status5"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Form Actions -->
+                    <div class="form-actions text-center" data-aos="zoom-in" data-aos-delay="800">
+                        <button type="button" class="btn btn-secondary me-3" id="clearForm">
+                            <i class="fas fa-eraser me-2"></i>Clear All
+                        </button>
+                        <button type="submit" class="btn-submit" id="submitBtn">
+                            <i class="fas fa-check me-2"></i>
+                            <span class="btn-text">Mark as Present</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Instructions Card -->
+    <div class="row mt-5" data-aos="fade-up" data-aos-delay="300">
+        <div class="col-12">
+            <div class="instructions-card glass-card p-4">
+                <h4 class="gradient-text mb-3">
+                    <i class="fas fa-info-circle me-2"></i>How to Use
+                </h4>
+                <div class="row g-4">
+                    <div class="col-md-3">
+                        <div class="instruction-item">
+                            <div class="instruction-icon bg-primary">
+                                <i class="fas fa-id-badge"></i>
+                            </div>
+                            <h6 class="text-white">Enter Member IDs</h6>
+                            <p class="text-secondary small">Type valid member ID numbers in the input fields above</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="instruction-item">
+                            <div class="instruction-icon bg-success">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <h6 class="text-white">Daily Records</h6>
+                            <p class="text-secondary small">Attendance is automatically recorded for today's date</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="instruction-item">
+                            <div class="instruction-icon bg-info">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <h6 class="text-white">Multiple Entries</h6>
+                            <p class="text-secondary small">Enter multiple member IDs at once to save time</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="instruction-item">
+                            <div class="instruction-icon bg-warning">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <h6 class="text-white">Validation</h6>
+                            <p class="text-secondary small">System checks if member IDs exist before recording</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mt-4" data-aos="fade-up" data-aos-delay="400">
+        <div class="col-12">
+            <div class="quick-actions glass-card p-4">
+                <h4 class="gradient-text mb-3">Quick Actions</h4>
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <a href="/all_members" class="quick-action-btn">
+                            <i class="fas fa-users me-2"></i>View All Members
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="/new_registration" class="quick-action-btn">
+                            <i class="fas fa-user-plus me-2"></i>Add New Member
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <button class="quick-action-btn" onclick="printAttendance()">
+                            <i class="fas fa-print me-2"></i>Print Report
+                        </button>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="/admin_portal" class="quick-action-btn">
+                            <i class="fas fa-home me-2"></i>Back to Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .page-header {
+        background: var(--bg-card);
+        backdrop-filter: var(--blur-md);
+        border: 1px solid var(--border-color);
+        border-radius: 1.5rem;
+    }
+
+    .attendance-date .badge {
+        font-size: 0.9rem;
+        padding: 0.5rem 1rem;
+        border-radius: 2rem;
+    }
+
+    .alert-modern {
+        border-radius: 1rem;
+        padding: 1.5rem;
+        display: flex;
+        align-items: center;
+        border: 1px solid var(--accent-success);
+        background: rgba(46, 213, 115, 0.1);
+        backdrop-filter: var(--blur-sm);
+        position: relative;
+    }
+
+    .alert-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: var(--accent-success);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+        color: white;
+        font-size: 1.2rem;
+    }
+
+    .alert-content h6 {
+        color: var(--text-primary);
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+    }
+
+    .alert-content p {
+        color: var(--text-secondary);
+    }
+
+    .btn-close {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: none;
+        border: none;
+        color: var(--text-muted);
+        font-size: 1rem;
+        cursor: pointer;
+        transition: color 0.3s ease;
+    }
+
+    .btn-close:hover {
+        color: var(--text-primary);
+    }
+
+    .attendance-form-container {
+        background: var(--bg-card);
+        backdrop-filter: var(--blur-md);
+        border: 1px solid var(--border-color);
+        border-radius: 1.5rem;
+    }
+
+    .form-header h3 {
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 600;
+    }
+
+    .attendance-counter {
+        background: var(--bg-secondary);
+        border-radius: 2rem;
+        padding: 0.75rem 1.5rem;
+        margin-top: 1rem;
+        display: inline-block;
+        color: var(--text-secondary);
+        transition: all 0.3s ease;
+    }
+
+    .attendance-counter.active {
+        background: var(--primary-gradient);
+        color: white;
+        transform: scale(1.05);
+    }
+
+    .input-group-modern {
+        position: relative;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .input-group-modern.focused {
+        transform: scale(1.02);
+    }
+
+    .input-label {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 0.75rem;
+        font-weight: 500;
+        color: var(--text-secondary);
+        font-size: 0.95rem;
+    }
+
+    .member-preview {
+        font-size: 0.8rem;
+        color: var(--accent-success);
+        font-style: italic;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .member-preview.show {
+        opacity: 1;
+    }
+
+    .input-wrapper {
+        position: relative;
+    }
+
+    .form-control-modern {
+        width: 100%;
+        padding: 1rem 1.5rem;
+        padding-right: 3rem;
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        border-radius: 0.75rem;
+        color: var(--text-primary);
+        font-size: 1rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .form-control-modern:focus {
+        outline: none;
+        border-color: var(--accent-primary);
+        background: var(--bg-card);
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        transform: translateY(-2px);
+    }
+
+    .form-control-modern.valid {
+        border-color: var(--accent-success);
+        background: rgba(46, 213, 115, 0.05);
+    }
+
+    .form-control-modern.invalid {
+        border-color: var(--accent-danger);
+        background: rgba(255, 71, 87, 0.05);
+    }
+
+    .form-control-modern::placeholder {
+        color: var(--text-muted);
+    }
+
+    .input-status {
+        position: absolute;
+        top: 50%;
+        right: 1rem;
+        transform: translateY(-50%);
+        font-size: 1.2rem;
+        opacity: 0;
+        transition: all 0.3s ease;
+    }
+
+    .input-status.valid {
+        color: var(--accent-success);
+        opacity: 1;
+    }
+
+    .input-status.invalid {
+        color: var(--accent-danger);
+        opacity: 1;
+    }
+
+    .form-actions {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .btn-secondary {
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        color: var(--text-secondary);
+        padding: 0.75rem 1.5rem;
+        border-radius: 2rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .btn-secondary:hover {
+        background: var(--border-color);
+        color: var(--text-primary);
+        transform: translateY(-2px);
+    }
+
+    .btn-submit {
+        background: var(--primary-gradient);
+        border: none;
+        padding: 1rem 3rem;
+        border-radius: 2rem;
+        color: white;
+        font-weight: 600;
+        font-size: 1.1rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn-submit::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        transition: left 0.5s;
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-glow);
+        filter: brightness(1.1);
+    }
+
+    .btn-submit:hover::before {
+        left: 100%;
+    }
+
+    .btn-submit:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
+
+    .btn-submit.loading::after {
+        content: '';
+        width: 16px;
+        height: 16px;
+        margin-left: 0.5rem;
+        border: 2px solid transparent;
+        border-top: 2px solid white;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        display: inline-block;
+    }
+
+    .instructions-card {
+        background: var(--bg-card);
+        backdrop-filter: var(--blur-md);
+        border: 1px solid var(--border-color);
+        border-radius: 1.5rem;
+    }
+
+    .instruction-item {
+        text-align: center;
+        padding: 1rem;
+    }
+
+    .instruction-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        color: white;
+        font-size: 1.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .instruction-item:hover .instruction-icon {
+        transform: scale(1.1);
+    }
+
+    .instruction-icon.bg-primary {
+        background: var(--primary-gradient);
+    }
+
+    .instruction-icon.bg-success {
+        background: linear-gradient(135deg, #51cf66, #40c057);
+    }
+
+    .instruction-icon.bg-info {
+        background: linear-gradient(135deg, #339af0, #228be6);
+    }
+
+    .instruction-icon.bg-warning {
+        background: linear-gradient(135deg, #ffa502, #ff6348);
+    }
+
+    .instruction-item h6 {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .quick-actions {
+        background: var(--bg-card);
+        backdrop-filter: var(--blur-md);
+        border: 1px solid var(--border-color);
+        border-radius: 1.5rem;
+    }
+
+    .quick-action-btn {
+        display: block;
+        padding: 1rem 1.5rem;
+        background: var(--bg-secondary);
+        color: var(--text-primary);
+        text-decoration: none;
+        border: 1px solid var(--border-color);
+        border-radius: 1rem;
+        transition: all 0.3s ease;
+        text-align: center;
+        font-weight: 500;
+        cursor: pointer;
+        width: 100%;
+    }
+
+    .quick-action-btn:hover {
+        background: var(--primary-gradient);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+        text-decoration: none;
+        border-color: transparent;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .attendance-form-container {
+            padding: 2rem 1.5rem;
+        }
         
-               {% endblock %}
+        .form-actions {
+            flex-direction: column;
+        }
+        
+        .btn-submit,
+        .btn-secondary {
+            width: 100%;
+            margin: 0.5rem 0;
+        }
+        
+        .instruction-item {
+            margin-bottom: 2rem;
+        }
+        
+        .quick-action-btn {
+            margin-bottom: 1rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .page-header {
+            padding: 2rem 1rem;
+        }
+        
+        .attendance-form-container {
+            padding: 1.5rem 1rem;
+        }
+        
+        .input-label {
+            font-size: 0.9rem;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+        
+        .form-control-modern {
+            padding: 0.875rem 1.25rem;
+        }
+    }
+
+    /* Animation keyframes */
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-10px); }
+        75% { transform: translateX(10px); }
+    }
+
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('attendanceForm');
+        const inputs = document.querySelectorAll('.form-control-modern');
+        const submitBtn = document.getElementById('submitBtn');
+        const clearBtn = document.getElementById('clearForm');
+        const memberCounter = document.getElementById('memberCount');
+        const attendanceCounter = document.querySelector('.attendance-counter');
+
+        // Set current date
+        const currentDate = new Date().toLocaleDateString('en-US', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+        document.getElementById('currentDate').textContent = currentDate;
+
+        // Mock member data for validation (replace with actual API call)
+        const mockMembers = {
+            1: 'John Doe',
+            2: 'Jane Smith', 
+            3: 'Mike Johnson',
+            4: 'Sarah Wilson',
+            5: 'David Brown'
+        };
+
+        // Validate member ID and show preview
+        function validateMemberId(input, index) {
+            const value = input.value;
+            const preview = document.getElementById(`preview${index}`);
+            const status = document.getElementById(`status${index}`);
+            
+            if (value && value !== '0') {
+                // Simulate API validation (replace with actual validation)
+                if (mockMembers[value]) {
+                    input.classList.remove('invalid');
+                    input.classList.add('valid');
+                    status.innerHTML = '<i class="fas fa-check"></i>';
+                    status.classList.remove('invalid');
+                    status.classList.add('valid');
+                    preview.textContent = `(${mockMembers[value]})`;
+                    preview.classList.add('show');
+                } else {
+                    input.classList.remove('valid');
+                    input.classList.add('invalid');
+                    status.innerHTML = '<i class="fas fa-times"></i>';
+                    status.classList.remove('valid');
+                    status.classList.add('invalid');
+                    preview.textContent = '(Member not found)';
+                    preview.classList.add('show');
+                }
+            } else {
+                input.classList.remove('valid', 'invalid');
+                status.classList.remove('valid', 'invalid');
+                preview.classList.remove('show');
+                preview.textContent = '';
+            }
+            
+            updateMemberCount();
+        }
+
+        // Update member count
+        function updateMemberCount() {
+            const validInputs = Array.from(inputs).filter(input => 
+                input.value && input.value !== '0' && input.classList.contains('valid')
+            );
+            
+            memberCounter.textContent = validInputs.length;
+            
+            if (validInputs.length > 0) {
+                attendanceCounter.classList.add('active');
+            } else {
+                attendanceCounter.classList.remove('active');
+            }
+        }
+
+        // Input event handlers
+        inputs.forEach((input, index) => {
+            const inputIndex = index + 1;
+            
+            // Focus events
+            input.addEventListener('focus', function() {
+                if (this.value === '0') {
+                    this.value = '';
+                }
+                this.parentElement.parentElement.classList.add('focused');
+            });
+            
+            input.addEventListener('blur', function() {
+                if (this.value === '') {
+                    this.value = '0';
+                }
+                this.parentElement.parentElement.classList.remove('focused');
+                validateMemberId(this, inputIndex);
+            });
+            
+            // Input validation
+            input.addEventListener('input', function() {
+                validateMemberId(this, inputIndex);
+            });
+            
+            // Enter key navigation
+            input.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && index < inputs.length - 1) {
+                    e.preventDefault();
+                    inputs[index + 1].focus();
+                } else if (e.key === 'Enter' && index === inputs.length - 1) {
+                    e.preventDefault();
+                    if (!submitBtn.disabled) {
+                        form.submit();
+                    }
+                }
+            });
+        });
+
+        // Clear form functionality
+        clearBtn.addEventListener('click', function() {
+            inputs.forEach((input, index) => {
+                input.value = '0';
+                input.classList.remove('valid', 'invalid');
+                document.getElementById(`status${index + 1}`).classList.remove('valid', 'invalid');
+                document.getElementById(`preview${index + 1}`).classList.remove('show');
+            });
+            updateMemberCount();
+            
+            // Animate clear action
+            this.style.animation = 'pulse 0.3s ease';
+            setTimeout(() => {
+                this.style.animation = '';
+            }, 300);
+        });
+
+        // Form submission
+        form.addEventListener('submit', function(e) {
+            const validInputs = Array.from(inputs).filter(input => 
+                input.value && input.value !== '0' && input.classList.contains('valid')
+            );
+            
+            if (validInputs.length === 0) {
+                e.preventDefault();
+                
+                // Shake animation
+                form.style.animation = 'shake 0.5s ease-in-out';
+                setTimeout(() => {
+                    form.style.animation = '';
+                }, 500);
+                
+                // Show error message
+                showTemporaryAlert('Please enter at least one valid member ID to take attendance.', 'danger');
+                return;
+            }
+
+            // Show loading state
+            submitBtn.classList.add('loading');
+            submitBtn.disabled = true;
+            submitBtn.querySelector('.btn-text').textContent = 'Processing...';
+        });
+
+        // Show temporary alert
+        function showTemporaryAlert(message, type = 'info') {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-modern`;
+            alertDiv.innerHTML = `
+                <div class="alert-icon">
+                    <i class="fas fa-${type === 'danger' ? 'exclamation-triangle' : 'info-circle'}"></i>
+                </div>
+                <div class="alert-content">
+                    <p class="mb-0">${message}</p>
+                </div>
+                <button type="button" class="btn-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            
+            const firstRow = document.querySelector('.container-fluid .row');
+            firstRow.insertAdjacentElement('afterend', alertDiv);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 5000);
+            
+            // Manual close
+            alertDiv.querySelector('.btn-close').addEventListener('click', () => {
+                alertDiv.remove();
+            });
+        }
+
+        // Initialize
+        updateMemberCount();
+    });
+
+    // Print attendance report
+    function printAttendance() {
+        const printWindow = window.open('', '_blank');
+        const currentDate = new Date().toLocaleDateString();
+        
+        printWindow.document.write(`
+            <html>
+                <head>
+                    <title>Attendance Report - ${currentDate}</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; padding: 20px; }
+                        h1 { color: #333; text-align: center; }
+                        .date { text-align: center; margin-bottom: 30px; }
+                        .member-list { margin-top: 20px; }
+                        .member-item { padding: 10px; border-bottom: 1px solid #eee; }
+                    </style>
+                </head>
+                <body>
+                    <h1>FitnessPro - Daily Attendance Report</h1>
+                    <div class="date">Date: ${currentDate}</div>
+                    <div class="member-list">
+                        <div class="member-item">Member attendance will be shown here after form submission.</div>
+                    </div>
+                </body>
+            </html>
+        `);
+        
+        printWindow.document.close();
+        printWindow.print();
+    }
+</script>
+
+{% endblock %}

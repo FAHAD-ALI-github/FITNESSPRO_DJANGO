@@ -1,137 +1,249 @@
-{% extends 'admin_base.html' %} {% load static %} {% block content %}
+{% extends 'admin_base.html' %}
+{% load static %}
+{% block content %}
 
-
-
-<div id="page-wrapper">
-  <div id="page-inner">
-    <div class="row">
-      <div class="col-md-12">
-        <h2>Welcome {{admin.first_name}} {{admin.last_name}} !</h2>
-        <pre></pre>
-      <h2 style="font-size: 24px">Admin Dashboard:</h2>
-      </div>
-      
-    </div>
-    <!-- /. ROW  -->
-    <div class="row">
-      <div class="col-md-3 col-sm-6 col-xs-6">
-
-        <a href="/new_registration" style="text-decoration:none;">  
-          <div class="panel panel-back noti-box">
-          <span class="icon-box bg-color-red set-icon">
-            <img src="{% static '/images/add.png' %}" style="height: 58px;">
-          </span>
-          <br><br><br>
-          <div class="text-box">
-            <p class="main-text" >Add New Member</p>
-            <p class="text-muted"></p>
-          </div>
-        </div>
-        </a>
-      </div>
-      <div class="col-md-3 col-sm-6 col-xs-6">
-        <a href="/all_members" style="text-decoration:none;">
-          <div class="panel panel-back noti-box">
-          <span class="icon-box bg-color-green set-icon">
-            <img src="{% static '/images/all.png' %}" style="height: 58px;">
-          </span>
-          <br><br><br>
-            <div class="text-box">
-            <p class="main-text">See All Members</p>
-            <p class="text-muted"></p>
-          </div>
-        </div>
-      </div>
-    </a>
-      <div class="col-md-3 col-sm-6 col-xs-6">
-        <a href="/attendance" style="text-decoration:none;">
-          <div class="panel panel-back noti-box">
-          <span class="icon-box bg-color-blue set-icon">
-            <i class="fa fa-edit fa-3x" style="padding: 10%; font-size: 58px;"></i>
-          </span>
-          <br><br><br>
-          <div class="text-box">
-            <p class="main-text">Take Attendance</p>
-            <p class="text-muted"></p>
-          </div>
-        </div>
-        </a>
-      </div>
-      <div class="col-md-3 col-sm-6 col-xs-6">
-        <a href="/change_admin_password?a_id={{admin.id}}" style="text-decoration:none;">
-          <div class="panel panel-back noti-box">
-          <span class="icon-box bg-color-brown set-icon">
-            <img src="{% static '/images/changepassword.png' %}" style="height: 58px; padding-top: 9%;">
-          </span>
-          <br><br><br>
-          <div class="text-box">
-            <p class="main-text">Change Password</p>
-            <p class="text-muted"></p>
-          </div>
-        </div>
-      </a>
-      </div>
-    </div>
-
-
-    <!-- <div class="row">
-      <div class="col-md-6 col-sm-12 col-xs-12">
-        <div class="panel panel-back noti-box">
-          <span class="icon-box bg-color-blue">
-            <i class="fa fa-warning"></i>
-          </span>
-          <div class="text-box">
-            <p class="main-text">52 Important Issues to Fix</p>
-            <p class="text-muted">Please fix these issues to work smooth</p>
-            <p class="text-muted">Time Left: 30 mins</p>
-            <hr />
-            <p class="text-muted">
-              <span class="text-muted color-bottom-txt"
-                ><i class="fa fa-edit"></i>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit gthn.
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit gthn.
-              </span>
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-md-3 col-sm-12 col-xs-12">
-        <div class="panel back-dash">
-          <i class="fa fa-dashboard fa-3x"></i><strong> &nbsp; SPEED</strong>
-          <p class="text-muted">
-            Lorem ipsum dolor sit amet, consectetur adipiscing sit ametsit amet
-            elit ftr. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-          </p>
-        </div>
-      </div>
-      <div class="col-md-3 col-sm-12 col-xs-12">
-        <div class="panel">
-          <div class="main-temp-back">
-            <div class="panel-body">
-              <div class="row">
-                <div class="col-xs-6">
-                  <i class="fa fa-cloud fa-3x"></i> Newyork City
-                </div>
-                <div class="col-xs-6">
-                  <div class="text-temp">10°</div>
-                </div>
-              </div>
+<div class="container-fluid">
+    <!-- Welcome Header -->
+    <div class="row mb-4" data-aos="fade-up">
+        <div class="col-12">
+            <div class="welcome-header">
+                <h1 class="gradient-text mb-2">Welcome {{admin.first_name}} {{admin.last_name}}!</h1>
+                <p class="text-secondary fs-5">Manage your fitness center operations from this dashboard</p>
             </div>
-          </div>
         </div>
-        <div class="panel panel-back noti-box">
-          <span class="icon-box bg-color-green set-icon">
-            <i class="fa fa-desktop"></i>
-          </span>
-          <div class="text-box">
-            <p class="main-text">Display</p>
-            <p class="text-muted">Looking Good</p>
-          </div>
-        </div>
-      </div>
+    </div>
 
-      {% endblock %}
-    </div> -->
-  </div>
+    <!-- Dashboard Cards -->
+    <div class="row g-4">
+        <!-- Add New Member -->
+        <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="100">
+            <a href="/new_registration" class="dashboard-card">
+                <div class="card-icon bg-red">
+                    <img src="{% static '/images/add.png' %}" alt="Add Member" style="width: 30px; height: 30px;">
+                </div>
+                <div class="card-content">
+                    <h4 class="card-title">Add New Member</h4>
+                    <p class="card-subtitle">Register new gym members to the system</p>
+                </div>
+                <div class="card-overlay">
+                    <i class="fas fa-arrow-right"></i>
+                </div>
+            </a>
+        </div>
+
+        <!-- See All Members -->
+        <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="200">
+            <a href="/all_members" class="dashboard-card">
+                <div class="card-icon bg-green">
+                    <img src="{% static '/images/all.png' %}" alt="All Members" style="width: 30px; height: 30px;">
+                </div>
+                <div class="card-content">
+                    <h4 class="card-title">See All Members</h4>
+                    <p class="card-subtitle">View and manage existing members</p>
+                </div>
+                <div class="card-overlay">
+                    <i class="fas fa-arrow-right"></i>
+                </div>
+            </a>
+        </div>
+
+        <!-- Take Attendance -->
+        <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="300">
+            <a href="/attendance" class="dashboard-card">
+                <div class="card-icon bg-blue">
+                    <i class="fas fa-clipboard-check fs-3 text-white"></i>
+                </div>
+                <div class="card-content">
+                    <h4 class="card-title">Take Attendance</h4>
+                    <p class="card-subtitle">Mark member attendance for today</p>
+                </div>
+                <div class="card-overlay">
+                    <i class="fas fa-arrow-right"></i>
+                </div>
+            </a>
+        </div>
+
+        <!-- Change Password -->
+        <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="400">
+            <a href="/change_admin_password?a_id={{admin.id}}" class="dashboard-card">
+                <div class="card-icon bg-purple">
+                    <img src="{% static '/images/changepassword.png' %}" alt="Change Password" style="width: 30px; height: 30px;">
+                </div>
+                <div class="card-content">
+                    <h4 class="card-title">Change Password</h4>
+                    <p class="card-subtitle">Update your admin account password</p>
+                </div>
+                <div class="card-overlay">
+                    <i class="fas fa-arrow-right"></i>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Statistics Section -->
+    <div class="row mt-5">
+        <div class="col-12" data-aos="fade-up">
+            <div class="stats-section glass-card p-4">
+                <h3 class="gradient-text mb-4">Quick Stats</h3>
+                <div class="row g-4">
+                    <div class="col-md-3 text-center">
+                        <div class="stat-item">
+                            <i class="fas fa-users fs-1 text-primary mb-2"></i>
+                            <h4 class="text-white">Total Members</h4>
+                            <p class="text-secondary">Active gym members</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        <div class="stat-item">
+                            <i class="fas fa-calendar-check fs-1 text-success mb-2"></i>
+                            <h4 class="text-white">Today's Attendance</h4>
+                            <p class="text-secondary">Members checked in</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        <div class="stat-item">
+                            <i class="fas fa-user-plus fs-1 text-warning mb-2"></i>
+                            <h4 class="text-white">New This Month</h4>
+                            <p class="text-secondary">Recent registrations</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        <div class="stat-item">
+                            <i class="fas fa-chart-line fs-1 text-info mb-2"></i>
+                            <h4 class="text-white">Growth Rate</h4>
+                            <p class="text-secondary">Monthly progress</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="row mt-4">
+        <div class="col-12" data-aos="fade-up" data-aos-delay="200">
+            <div class="recent-activity glass-card p-4">
+                <h3 class="gradient-text mb-4">Recent Activity</h3>
+                <div class="activity-list">
+                    <div class="activity-item d-flex align-items-center p-3 mb-3 rounded" style="background: var(--bg-secondary);">
+                        <div class="activity-icon bg-success rounded-circle p-2 me-3">
+                            <i class="fas fa-user-plus text-white"></i>
+                        </div>
+                        <div class="activity-content">
+                            <h6 class="text-white mb-1">New Member Registration</h6>
+                            <p class="text-secondary mb-0 small">A new member joined the gym</p>
+                        </div>
+                        <div class="activity-time ms-auto">
+                            <small class="text-muted">2 hours ago</small>
+                        </div>
+                    </div>
+                    <div class="activity-item d-flex align-items-center p-3 mb-3 rounded" style="background: var(--bg-secondary);">
+                        <div class="activity-icon bg-info rounded-circle p-2 me-3">
+                            <i class="fas fa-clipboard-check text-white"></i>
+                        </div>
+                        <div class="activity-content">
+                            <h6 class="text-white mb-1">Attendance Updated</h6>
+                            <p class="text-secondary mb-0 small">Daily attendance has been recorded</p>
+                        </div>
+                        <div class="activity-time ms-auto">
+                            <small class="text-muted">4 hours ago</small>
+                        </div>
+                    </div>
+                    <div class="activity-item d-flex align-items-center p-3 rounded" style="background: var(--bg-secondary);">
+                        <div class="activity-icon bg-warning rounded-circle p-2 me-3">
+                            <i class="fas fa-cog text-white"></i>
+                        </div>
+                        <div class="activity-content">
+                            <h6 class="text-white mb-1">System Update</h6>
+                            <p class="text-secondary mb-0 small">Admin settings have been updated</p>
+                        </div>
+                        <div class="activity-time ms-auto">
+                            <small class="text-muted">1 day ago</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<style>
+    .welcome-header {
+        text-align: center;
+        padding: 2rem 0;
+        background: var(--bg-card);
+        backdrop-filter: var(--blur-md);
+        border-radius: 1.5rem;
+        border: 1px solid var(--border-color);
+        margin-bottom: 2rem;
+    }
+
+    .dashboard-card {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .card-overlay {
+        position: absolute;
+        top: 1.5rem;
+        right: 1.5rem;
+        width: 40px;
+        height: 40px;
+        background: var(--primary-gradient);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        opacity: 0;
+        transform: translateX(20px);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .dashboard-card:hover .card-overlay {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    .stat-item {
+        padding: 1rem;
+        border-radius: 1rem;
+        background: var(--bg-secondary);
+        transition: all 0.3s ease;
+    }
+
+    .stat-item:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .stats-section {
+        background: var(--bg-card);
+        backdrop-filter: var(--blur-md);
+    }
+
+    .recent-activity {
+        background: var(--bg-card);
+        backdrop-filter: var(--blur-md);
+    }
+
+    .activity-icon {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    @media (max-width: 768px) {
+        .welcome-header {
+            padding: 1.5rem 1rem;
+        }
+        
+        .dashboard-card {
+            margin-bottom: 1rem;
+        }
+    }
+</style>
+
+{% endblock %}

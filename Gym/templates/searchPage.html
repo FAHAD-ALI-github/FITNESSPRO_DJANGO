@@ -1,43 +1,583 @@
-{% extends 'admin_base.html' %} 
+{% extends 'admin_base.html' %}
 {% load static %}
 {% block content %}
 
-<div id="page-wrapper">
-  <div id="page-inner">
-
-    <form class="d-flex" method="post" action="/searchPage">
-        {% csrf_token %}
-      <input class="form-control me-2" name="searchedMember" placeholder="Search Here For Members" >
-      <button class="btn btn-danger" style="float: inline-end; margin-top: 10px; margin-right: 20px;" type="submit">Search</button>
-    </form>
-
-    <div class="row">
-      <div class="col-md-12">
-        <h2>Searched Members List </h2>
-      </div>
-    </div>
-
-    
-    <pre></pre>
-    
-    
-      
-    <div class="row">
-      {% for user_ in members %}
-     <div>
-        <a href="/userdetails?u_id={{user_.id}}" style="text-decoration: none;"><div class="panel panel-back noti-box">
-          <span class="icon-box bg-color-blue set-icon" style="height: 80px; width: 80px; border-radius: 50%;"  >
-            <img src="{{user_.image.url}}" style="height: 80px; width: 80px; border-radius: 50%;"  />
-          </span>
-          <div class="text-box">
-            <p class="main-text">{{user_.first_name}}&nbsp;{{user_.last_name}}</p>
-            <p class="text-muted">@{{user_.username}}</p>
-          </div></a>
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="row mb-4" data-aos="fade-up">
+        <div class="col-12">
+            <div class="page-header glass-card p-4">
+                <div class="d-flex align-items-center justify-content-center">
+                    <i class="fas fa-search fs-1 gradient-text me-3"></i>
+                    <div class="text-center">
+                        <h1 class="gradient-text mb-2">Search Results</h1>
+                        <p class="text-secondary">Find and manage gym members</p>
+                    </div>
+                </div>
+            </div>
         </div>
-      {% endfor %}
     </div>
 
-  </div>
+    <!-- Search Section -->
+    <div class="row mb-4" data-aos="fade-up" data-aos-delay="100">
+        <div class="col-12">
+            <div class="search-section glass-card p-4">
+                <form class="search-form" method="post" action="/searchPage">
+                    {% csrf_token %}
+                    <div class="input-group search-input-group">
+                        <span class="input-group-text search-icon">
+                            <i class="fas fa-search"></i>
+                        </span>
+                        <input class="form-control search-input" name="searchedMember" placeholder="Search for members by name, username, or ID..." autocomplete="off">
+                        <button class="btn btn-primary search-btn" type="submit">
+                            <i class="fas fa-search me-2"></i>Search
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search Results -->
+    <div class="row" data-aos="fade-up" data-aos-delay="200">
+        <div class="col-12">
+            <div class="results-header mb-4">
+                <h3 class="text-white">
+                    <i class="fas fa-users me-2 text-primary"></i>
+                    Search Results
+                    {% if members %}
+                        <span class="results-count">({{ members|length }} found)</span>
+                    {% endif %}
+                </h3>
+            </div>
+            
+            <div class="members-container">
+                {% for user_ in members %}
+                <div class="member-item" data-aos="zoom-in" data-aos-delay="{{forloop.counter|add:200}}">
+                    <a href="/userdetails?u_id={{user_.id}}" class="member-card-link">
+                        <div class="member-card-modern search-result">
+                            <div class="member-avatar-container">
+                                <img src="{{user_.image.url}}" class="member-avatar-modern" alt="{{user_.first_name}} {{user_.last_name}}">
+                                <div class="avatar-overlay">
+                                    <i class="fas fa-eye"></i>
+                                </div>
+                                <div class="member-status-indicator active"></div>
+                            </div>
+                            <div class="member-info-modern">
+                                <h5 class="member-name">{{user_.first_name}} {{user_.last_name}}</h5>
+                                <p class="member-username">@{{user_.username}}</p>
+                                <div class="member-meta">
+                                    <span class="meta-item">
+                                        <i class="fas fa-id-badge me-1"></i>
+                                        ID: {{user_.id}}
+                                    </span>
+                                    <span class="meta-item">
+                                        <i class="fas fa-calendar me-1"></i>
+                                        Member since 2024
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="member-actions">
+                                <button class="action-btn view-btn" data-bs-toggle="tooltip" title="View Details">
+                                    <i class="fas fa-arrow-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                {% empty %}
+                <div class="col-12" data-aos="fade-up">
+                    <div class="empty-state glass-card text-center p-5">
+                        <i class="fas fa-search fs-1 text-muted mb-3"></i>
+                        <h3 class="text-white mb-2">No Results Found</h3>
+                        <p class="text-secondary mb-4">We couldn't find any members matching your search criteria.</p>
+                        <div class="empty-state-actions">
+                            <a href="/all_members" class="btn btn-primary me-3">
+                                <i class="fas fa-users me-2"></i>View All Members
+                            </a>
+                            <a href="/new_registration" class="btn btn-outline-primary">
+                                <i class="fas fa-plus me-2"></i>Add New Member
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Search Tips -->
+    {% if not members %}
+    <div class="row mt-5" data-aos="fade-up" data-aos-delay="300">
+        <div class="col-12">
+            <div class="search-tips glass-card p-4">
+                <h4 class="gradient-text mb-3">
+                    <i class="fas fa-lightbulb me-2"></i>Search Tips
+                </h4>
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <div class="tip-item">
+                            <div class="tip-icon bg-primary">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <h6 class="text-white">Search by Name</h6>
+                            <p class="text-secondary small">Try searching with first name, last name, or full name</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="tip-item">
+                            <div class="tip-icon bg-success">
+                                <i class="fas fa-at"></i>
+                            </div>
+                            <h6 class="text-white">Username Search</h6>
+                            <p class="text-secondary small">Search using the member's username (with or without @)</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="tip-item">
+                            <div class="tip-icon bg-info">
+                                <i class="fas fa-hashtag"></i>
+                            </div>
+                            <h6 class="text-white">ID Number</h6>
+                            <p class="text-secondary small">Enter the exact member ID number for precise results</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Quick Actions -->
+    <div class="row mt-4" data-aos="fade-up" data-aos-delay="400">
+        <div class="col-12">
+            <div class="quick-actions glass-card p-4">
+                <h4 class="gradient-text mb-3">Quick Actions</h4>
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <a href="/all_members" class="quick-action-btn">
+                            <i class="fas fa-users me-2"></i>View All Members
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="/new_registration" class="quick-action-btn">
+                            <i class="fas fa-user-plus me-2"></i>Add New Member
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="/attendance" class="quick-action-btn">
+                            <i class="fas fa-clipboard-check me-2"></i>Take Attendance
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="/admin_portal" class="quick-action-btn">
+                            <i class="fas fa-home me-2"></i>Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<style>
+    .page-header {
+        background: var(--bg-card);
+        backdrop-filter: var(--blur-md);
+        border: 1px solid var(--border-color);
+        border-radius: 1.5rem;
+    }
+
+    .search-section {
+        background: var(--bg-card);
+        backdrop-filter: var(--blur-md);
+        border: 1px solid var(--border-color);
+        border-radius: 1.5rem;
+    }
+
+    .search-input-group {
+        max-width: 800px;
+        margin: 0 auto;
+        border-radius: 2rem;
+        overflow: hidden;
+        box-shadow: var(--shadow-md);
+    }
+
+    .search-icon {
+        background: var(--bg-secondary);
+        border: none;
+        color: var(--text-secondary);
+        padding: 1rem 1.5rem;
+    }
+
+    .search-input {
+        border: none;
+        padding: 1rem 1.5rem;
+        font-size: 1.1rem;
+        background: var(--bg-secondary);
+        color: var(--text-primary);
+    }
+
+    .search-input:focus {
+        background: var(--bg-card);
+        box-shadow: none;
+        border-color: transparent;
+        color: var(--text-primary);
+    }
+
+    .search-input::placeholder {
+        color: var(--text-muted);
+    }
+
+    .search-btn {
+        padding: 1rem 2rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border: none;
+    }
+
+    .results-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .results-count {
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        font-weight: normal;
+    }
+
+    .members-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 2rem;
+        margin-top: 2rem;
+    }
+
+    .member-card-link {
+        text-decoration: none;
+        color: inherit;
+        display: block;
+    }
+
+    .member-card-modern {
+        background: var(--bg-card);
+        backdrop-filter: var(--blur-md);
+        border: 1px solid var(--border-color);
+        border-radius: 1.5rem;
+        padding: 2rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+    }
+
+    .member-card-modern.search-result::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: var(--accent-gradient);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .member-card-modern:hover {
+        transform: translateY(-8px);
+        border-color: var(--border-hover);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .member-card-modern:hover::before {
+        opacity: 1;
+    }
+
+    .member-avatar-container {
+        position: relative;
+        flex-shrink: 0;
+    }
+
+    .member-avatar-modern {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        border: 3px solid var(--accent-primary);
+        object-fit: cover;
+        transition: all 0.3s ease;
+    }
+
+    .avatar-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(102, 126, 234, 0.8);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: all 0.3s ease;
+        color: white;
+        font-size: 1.2rem;
+    }
+
+    .member-card-modern:hover .avatar-overlay {
+        opacity: 1;
+    }
+
+    .member-status-indicator {
+        position: absolute;
+        bottom: 5px;
+        right: 5px;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        border: 2px solid var(--bg-card);
+    }
+
+    .member-status-indicator.active {
+        background: var(--accent-success);
+        box-shadow: 0 0 0 2px var(--accent-success);
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+    }
+
+    .member-info-modern {
+        flex: 1;
+        text-align: left;
+    }
+
+    .member-name {
+        color: var(--text-primary);
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        font-size: 1.2rem;
+    }
+
+    .member-username {
+        color: var(--text-muted);
+        margin-bottom: 1rem;
+        font-size: 0.95rem;
+    }
+
+    .member-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .meta-item {
+        display: flex;
+        align-items: center;
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+    }
+
+    .member-actions {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        opacity: 0;
+        transition: all 0.3s ease;
+    }
+
+    .member-card-modern:hover .member-actions {
+        opacity: 1;
+    }
+
+    .action-btn {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: none;
+        background: var(--primary-gradient);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .action-btn:hover {
+        transform: scale(1.1);
+        box-shadow: var(--shadow-glow);
+    }
+
+    .empty-state {
+        background: var(--bg-card);
+        backdrop-filter: var(--blur-md);
+        border: 1px solid var(--border-color);
+        border-radius: 1.5rem;
+    }
+
+    .empty-state-actions {
+        margin-top: 2rem;
+    }
+
+    .btn-outline-primary {
+        background: transparent;
+        border: 2px solid;
+        border-image: var(--primary-gradient) 1;
+        color: var(--text-primary);
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+        border-radius: 2rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        text-decoration: none;
+    }
+
+    .btn-outline-primary:hover {
+        background: var(--primary-gradient);
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-glow);
+        color: white;
+        text-decoration: none;
+    }
+
+    .search-tips {
+        background: var(--bg-card);
+        backdrop-filter: var(--blur-md);
+        border: 1px solid var(--border-color);
+        border-radius: 1.5rem;
+    }
+
+    .tip-item {
+        text-align: center;
+        padding: 1rem;
+    }
+
+    .tip-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        color: white;
+        font-size: 1.5rem;
+    }
+
+    .tip-icon.bg-primary {
+        background: var(--primary-gradient);
+    }
+
+    .tip-icon.bg-success {
+        background: linear-gradient(135deg, #51cf66, #40c057);
+    }
+
+    .tip-icon.bg-info {
+        background: linear-gradient(135deg, #339af0, #228be6);
+    }
+
+    .quick-actions {
+        background: var(--bg-card);
+        backdrop-filter: var(--blur-md);
+        border: 1px solid var(--border-color);
+        border-radius: 1.5rem;
+    }
+
+    .quick-action-btn {
+        display: block;
+        padding: 1rem 1.5rem;
+        background: var(--bg-secondary);
+        color: var(--text-primary);
+        text-decoration: none;
+        border-radius: 1rem;
+        transition: all 0.3s ease;
+        text-align: center;
+        font-weight: 500;
+    }
+
+    .quick-action-btn:hover {
+        background: var(--primary-gradient);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+        text-decoration: none;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .members-container {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+        
+        .member-card-modern {
+            padding: 1.5rem;
+            flex-direction: column;
+            text-align: center;
+            gap: 1rem;
+        }
+        
+        .member-info-modern {
+            text-align: center;
+        }
+        
+        .member-meta {
+            justify-content: center;
+        }
+        
+        .search-input-group {
+            flex-direction: column;
+            border-radius: 1rem;
+        }
+        
+        .search-icon, .search-input, .search-btn {
+            border-radius: 0;
+        }
+        
+        .search-icon {
+            border-radius: 1rem 1rem 0 0;
+        }
+        
+        .search-btn {
+            border-radius: 0 0 1rem 1rem;
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+
+        // Auto-focus search input
+        const searchInput = document.querySelector('.search-input');
+        if (searchInput) {
+            searchInput.focus();
+        }
+
+        // Add loading state to search
+        const searchForm = document.querySelector('.search-form');
+        searchForm.addEventListener('submit', function() {
+            const submitBtn = this.querySelector('.search-btn');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Searching...';
+            submitBtn.disabled = true;
+        });
+    });
+</script>
 
 {% endblock %}

@@ -78,7 +78,7 @@ def new_registration(request):
                 user.muscle_strength_id=3
             user.email=email
             user.save()
-            msg="You're Successfully Signed In"
+            msg="You're Successfully Registered!"
         data["first_name"]=first_name
         data["last_name"]=last_name
         data["dob"]=dob
@@ -170,7 +170,8 @@ def attendance(request):
 
 
 def admin_portal(request):
-    return render(request, 'admin_portal.html')
+    admin = Gym_admin.objects.get(id=request.session['admin_id'])
+    return render(request, 'admin_portal.html', {'admin': admin})
 
 def change_admin_password(request):   
     data={}
