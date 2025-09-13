@@ -1,6 +1,10 @@
 from django.shortcuts import render, redirect
 from .models import *
 import datetime
+import json
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
 
 
 # Hardcoded admin credentials
@@ -274,6 +278,58 @@ def delete_profbyuser(request):
     user_=Gym_user.objects.get(id=user_id)
     user_.delete()
     return redirect("/")
+
+
+
+@csrf_exempt
+@require_POST
+def upload_profile_image(request):
+    try:
+        # Get user ID from POST data or GET parameter
+        user_id = request.POST.get('user_id') or request.GET.get('u_id')
+        
+        if not user_id:
+            return JsonResponse({'success': False, 'message': 'User ID is required.'})
+        
+        # Get the user
+        user = Gym_user.objects.get(id=int(user_id))
+        
+        if 'image' in request.FILES:
+            image_file = request.FILES['image']
+            
+            # Validate file type
+            allowed_types = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp']
+            if image_file.content_type not in allowed_types:
+                return JsonResponse({'success': False, 'message': 'Invalid file type. Please upload JPEG, PNG, GIF, or WebP images.'})
+            
+            # Validate file size (5MB limit)
+            if image_file.size > 5 * 1024 * 1024:
+                return JsonResponse({'success': False, 'message': 'File too large. Please upload images smaller than 5MB.'})
+            
+            # Delete old image if it exists and is not the default
+            if user.image and user.image.name != "users_profile_images/image.png":
+                try:
+                    user.image.delete(save=False)
+                except:
+                    pass  # Ignore if file doesn't exist
+            
+            # Save the new image
+            user.image.save(image_file.name, image_file, save=True)
+            
+            return JsonResponse({
+                'success': True, 
+                'message': 'Profile picture updated successfully!',
+                'image_url': user.image.url
+            })
+        else:
+            return JsonResponse({'success': False, 'message': 'No image file provided.'})
+            
+    except Gym_user.DoesNotExist:
+        return JsonResponse({'success': False, 'message': 'User does not exist.'})
+    except ValueError:
+        return JsonResponse({'success': False, 'message': 'Invalid user ID format.'})
+    except Exception as e:
+        return JsonResponse({'success': False, 'message': f'An error occurred: {str(e)}'})
 
 
 def diet_plan(request):

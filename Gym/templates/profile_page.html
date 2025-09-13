@@ -1,85 +1,1243 @@
+{% extends 'parent.html' %}
 {% load static %}
-<html lang="en">
-   <head>
-      <meta charset="utf-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1">
-      <title> {{user.first_name}} {{user.last_name}}'s Profile - Fitnesspro </title>
-      <!-- Style CSS -->
-      <link rel="stylesheet" href="{% static '/css/styles_of_profilePage.css' %}" >
-      <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;600&display=swap" rel="stylesheet">
-   </head>
-   <body>
-      
-      <main class="cd__main">
-         <div class="profile-page">
-  <div class="content">
-    <div class="content__cover">
-    
-    <div class="content__avatar" style="background: #d1d1d1"><img src="{{user.image.url}}" style="height: 100%; width: 100%; border-radius: 50%;"  ></div>
-      <div class="content__bull"><span></span><span></span><span></span><span></span><span></span>
-      </div>
-    </div>
-    <div class="content__actions"><a href="/change_user_password?u_id={{user.id}}">
-      <img style="height: 35px;" src="{% static '/images/changepassword.png' %}" >
-      <span>&nbsp;Change Password</span></a>
-    <!-- <a href="/">
-      <img style="height: 35px;" src="{% static '/images/user.png' %}" >
-      <span>&nbsp;/span></a> -->
-        <a href="/delete_user?u_id={{user.id}}">
-          <span>DELETE YOUR PROFILE</span></a>
-      </div>
-      <div class="content__title">
-        <h1>{{user.first_name}} {{user.last_name}}</h1><span>username : @{{user.username}}</span>
-        <pre></pre>
-        <span>id # {{user.id}}</span>
-        </div>
-      <div class="content__description">
-        <p><b>{{user.muscle_strength}}</b> Level User</p>
-      <p>Do {{user.gym_split}}</p>
-      <p>Lives in {{user.address}}, Lahore</p>
-    </div>
-    <ul class="content__list">
-      <li><span>{{user.no_of_days}} days</span>TOTAL ATTENDANCE</li>
-      <li><span>{{bmi}}</span>BMI</li>
-      <li><span>{{bmi_status}}</span>BMI STATUS</li>
-    </ul>
-    <div class="content__button"><a class="button" href="/workout_plan?pid={{user.id}}">
-        <div class="button__border"></div>
-        <div class="button__bg"></div>
-        <p class="button__text">Start {{today}}'s EXERCISE</p></a>
-        <br>
-        <br>
-        <a class="button" href="/diet_plan">
-          <div class="button__border"></div>
-          <div class="button__bg"></div>
-          <p class="button__text">See Your Diet Plan</p></a>
-      </div>
 
-  </div>
-  <div class="bg">
-    <div><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+{% block title %}{{user.first_name}} {{user.last_name}}'s Profile - FitnessPro{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Profile-specific enhancements to parent theme */
+    .profile-container {
+        min-height: 100vh;
+        padding: 8rem 0 2rem;
+        position: relative;
+    }
+
+    .profile-card {
+        background: var(--bg-card);
+        backdrop-filter: var(--blur-md);
+        border: 1px solid var(--border-color);
+        border-radius: 2rem;
+        overflow: hidden;
+        box-shadow: var(--shadow-lg);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+    }
+
+    .profile-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: var(--primary-gradient);
+        opacity: 0.7;
+    }
+
+    .profile-header {
+        background: var(--primary-gradient);
+        padding: 3rem 2rem 8rem;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .profile-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='4'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        opacity: 0.3;
+    }
+
+    .profile-avatar-container {
+        position: relative;
+        display: inline-block;
+        margin-bottom: 2rem;
+        cursor: pointer;
+    }
+
+    .profile-avatar {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        border: 6px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.1), var(--shadow-lg);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        object-fit: cover;
+        position: relative;
+        z-index: 2;
+    }
+
+    .profile-avatar:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.2), var(--shadow-glow);
+    }
+
+    .profile-avatar-container:hover::after {
+        content: 'Change Photo';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+        padding: 8px;
+        font-size: 12px;
+        border-radius: 0 0 75px 75px;
+        z-index: 3;
+    }
+
+    .online-indicator {
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+        width: 24px;
+        height: 24px;
+        background: var(--accent-success);
+        border: 4px solid white;
+        border-radius: 50%;
+        z-index: 3;
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0% {
+            transform: scale(1);
+            box-shadow: 0 0 0 0 rgba(46, 213, 115, 0.7);
+        }
+        70% {
+            transform: scale(1);
+            box-shadow: 0 0 0 10px rgba(46, 213, 115, 0);
+        }
+        100% {
+            transform: scale(1);
+            box-shadow: 0 0 0 0 rgba(46, 213, 115, 0);
+        }
+    }
+
+    .profile-name {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: white;
+        margin-bottom: 0.5rem;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .profile-username {
+        font-size: 1.1rem;
+        color: rgba(255, 255, 255, 0.8);
+        margin-bottom: 0.25rem;
+    }
+
+    .profile-id {
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.6);
+        font-family: 'Space Grotesk', monospace;
+    }
+
+    .profile-body {
+        padding: 2rem;
+        position: relative;
+        margin-top: -6rem;
+        z-index: 2;
+    }
+
+    .profile-actions {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .action-btn {
+        background: var(--bg-card);
+        backdrop-filter: var(--blur-sm);
+        border: 1px solid var(--border-color);
+        border-radius: 1rem;
+        padding: 0.75rem 1.5rem;
+        color: var(--text-primary);
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        position: relative;
+        overflow: hidden;
+        min-width: 160px;
+        justify-content: center;
+    }
+
+    .action-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+        transition: left 0.5s;
+    }
+
+    .action-btn:hover::before {
+        left: 100%;
+    }
+
+    .action-btn:hover {
+        color: var(--text-primary);
+        border-color: var(--border-hover);
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-md);
+        background: var(--bg-card-hover);
+    }
+
+    .action-btn.danger {
+        border-color: var(--accent-danger);
+        color: var(--accent-danger);
+    }
+
+    .action-btn.danger:hover {
+        background: var(--accent-danger);
+        color: white;
+        box-shadow: var(--shadow-glow-danger);
+    }
+
+    .profile-info {
+        background: var(--bg-card);
+        backdrop-filter: var(--blur-sm);
+        border: 1px solid var(--border-color);
+        border-radius: 1.5rem;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .profile-info:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+        border-color: var(--border-hover);
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .info-item {
+        text-align: center;
+    }
+
+    .info-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: var(--primary-gradient);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        font-size: 1.5rem;
+        color: white;
+        box-shadow: var(--shadow-sm);
+        transition: all 0.3s ease;
+    }
+
+    .info-item:hover .info-icon {
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: var(--shadow-glow);
+    }
+
+    .info-label {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.5rem;
+    }
+
+    .info-value {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        font-family: 'Space Grotesk', sans-serif;
+    }
+
+    .stats-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        background: var(--bg-card);
+        backdrop-filter: var(--blur-sm);
+        border: 1px solid var(--border-color);
+        border-radius: 1.25rem;
+        padding: 1.5rem;
+        text-align: center;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background: var(--primary-gradient);
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+    }
+
+    .stat-card:hover::before {
+        transform: translateX(0);
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--border-hover);
+        box-shadow: var(--shadow-md);
+    }
+
+    .stat-number {
+        font-size: 2rem;
+        font-weight: 800;
+        background: var(--primary-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 0.5rem;
+        font-family: 'Space Grotesk', sans-serif;
+    }
+
+    .stat-label {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .cta-section {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .cta-card {
+        background: var(--bg-card);
+        backdrop-filter: var(--blur-sm);
+        border: 1px solid var(--border-color);
+        border-radius: 1.5rem;
+        padding: 2rem;
+        text-align: center;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .cta-card::before {
+        content: '';
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        background: var(--primary-gradient);
+        border-radius: 1.5rem;
+        z-index: -1;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .cta-card:hover::before {
+        opacity: 1;
+    }
+
+    .cta-card:hover {
+        transform: translateY(-8px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .cta-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: var(--primary-gradient);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        font-size: 2rem;
+        color: white;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .cta-title {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 1rem;
+        font-family: 'Space Grotesk', sans-serif;
+    }
+
+    .cta-btn {
+        background: var(--primary-gradient);
+        border: none;
+        border-radius: 2rem;
+        padding: 0.875rem 2rem;
+        color: white;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .cta-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        transition: left 0.5s;
+        z-index: 1;
+    }
+
+    .cta-btn:hover::before {
+        left: 100%;
+    }
+
+    .cta-btn:hover {
+        color: white;
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-glow);
+        filter: brightness(1.1);
+    }
+
+    .cta-btn.secondary {
+        background: var(--secondary-gradient);
+    }
+
+    /* BMI Status Colors */
+    .bmi-underweight { color: var(--accent-warning); }
+    .bmi-normal { color: var(--accent-success); }
+    .bmi-overweight { color: var(--accent-warning); }
+    .bmi-obese { color: var(--accent-danger); }
+
+    /* Theme Switcher */
+    .theme-switcher {
+        position: fixed;
+        top: 50%;
+        right: 20px;
+        transform: translateY(-50%);
+        background: var(--bg-card);
+        backdrop-filter: var(--blur-md);
+        border: 1px solid var(--border-color);
+        border-radius: 1rem;
+        padding: 1rem;
+        z-index: 1000;
+        transition: all 0.3s ease;
+    }
+
+    .theme-colors {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .theme-color {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        border: 2px solid var(--border-color);
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .theme-color.active {
+        border-color: white;
+        box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    }
+
+    .theme-orange { background: linear-gradient(135deg, #ff6b35, #f7931e); }
+    .theme-green { background: linear-gradient(135deg, #2ed573, #17c0eb); }
+    .theme-purple { background: linear-gradient(135deg, #a55eea, #26de81); }
+    .theme-blue { background: linear-gradient(135deg, #3742fa, #2f3542); }
+
+    /* Modal Styles */
+    .modal-content {
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        border-radius: 1.5rem;
+        box-shadow: var(--shadow-lg);
+        color: var(--text-primary);
+    }
+
+    .modal-header {
+        border-bottom: 1px solid var(--border-color);
+        padding: 1.5rem;
+    }
+
+    .modal-title {
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 700;
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+    }
+
+    .modal-footer {
+        border-top: 1px solid var(--border-color);
+        padding: 1.5rem;
+    }
+
+    .btn-close {
+        filter: invert(1);
+    }
+
+    .upload-preview {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin: 0 auto 1.5rem;
+        display: block;
+        border: 4px solid var(--border-color);
+    }
+
+    .upload-btn {
+        background: var(--primary-gradient);
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 0.75rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .upload-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-glow);
+    }
+
+    .form-control {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        color: var(--text-primary);
+        border-radius: 0.75rem;
+        padding: 0.75rem 1rem;
+    }
+
+    .form-control:focus {
+        background: var(--bg-card);
+        border-color: var(--accent-primary);
+        color: var(--text-primary);
+        box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.25);
+    }
+
+    .form-label {
+        color: var(--text-secondary);
+        margin-bottom: 0.5rem;
+    }
+
+    /* Notification */
+    .notification {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 1rem 1.5rem;
+        border-radius: 0.75rem;
+        z-index: 1050;
+        min-width: 300px;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        box-shadow: var(--shadow-md);
+        transform: translateX(100%);
+        opacity: 0;
+        transition: all 0.3s ease;
+    }
+
+    .notification.show {
+        transform: translateX(0);
+        opacity: 1;
+    }
+
+    .notification.success {
+        background: var(--success-gradient);
+        border: 1px solid rgba(46, 213, 115, 0.3);
+    }
+
+    .notification.error {
+        background: var(--danger-gradient);
+        border: 1px solid rgba(255, 71, 87, 0.3);
+    }
+
+    .notification-icon {
+        font-size: 1.5rem;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .profile-name {
+            font-size: 2rem;
+        }
+
+        .profile-actions {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .action-btn {
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .profile-header {
+            padding: 2rem 1rem 6rem;
+        }
+
+        .profile-body {
+            margin-top: -4rem;
+        }
+
+        .theme-switcher {
+            position: relative;
+            top: auto;
+            right: auto;
+            transform: none;
+            margin: 2rem auto;
+            width: fit-content;
+        }
+
+        .theme-colors {
+            flex-direction: row;
+        }
+
+        .notification {
+            left: 20px;
+            right: 20px;
+            min-width: auto;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .profile-container {
+            padding: 6rem 0 1rem;
+        }
+
+        .profile-card {
+            margin: 0 1rem;
+            border-radius: 1.5rem;
+        }
+
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+        }
+
+        .profile-name {
+            font-size: 1.75rem;
+        }
+
+        .info-grid,
+        .stats-container,
+        .cta-section {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* Entrance Animations */
+    @keyframes slideInUp {
+        from {
+            opacity: 0;
+            transform: translate3d(0, 40px, 0);
+        }
+        to {
+            opacity: 1;
+            transform: translate3d(0, 0, 0);
+        }
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    .animate-slide-up {
+        animation: slideInUp 0.8s ease-out;
+    }
+
+    .animate-fade-in {
+        animation: fadeIn 1s ease-out;
+    }
+
+    .animate-delay-1 { animation-delay: 0.2s; animation-fill-mode: backwards; }
+    .animate-delay-2 { animation-delay: 0.4s; animation-fill-mode: backwards; }
+    .animate-delay-3 { animation-delay: 0.6s; animation-fill-mode: backwards; }
+    .animate-delay-4 { animation-delay: 0.8s; animation-fill-mode: backwards; }
+
+    /* Variables for theme consistency */
+    :root {
+        --success-gradient: linear-gradient(135deg, #2ed573 0%, #17c0eb 100%);
+        --warning-gradient: linear-gradient(135deg, #ffa502 0%, #ff6348 100%);
+        --danger-gradient: linear-gradient(135deg, #ff4757 0%, #ff3838 100%);
+        --bg-card-hover: rgba(255, 255, 255, 0.08);
+        --shadow-glow-success: 0 0 40px rgba(46, 213, 115, 0.3);
+        --shadow-glow-danger: 0 0 40px rgba(255, 71, 87, 0.3);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Profile Container -->
+<div class="profile-container">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10 col-xl-8">
+                <div class="profile-card animate-slide-up">
+                    <!-- Profile Header -->
+                    <div class="profile-header">
+                        <div class="profile-avatar-container animate-fade-in animate-delay-1" id="avatar-container">
+                            <img src="{{user.image.url}}" alt="Profile Avatar" class="profile-avatar" id="profile-avatar">
+                            <div class="online-indicator"></div>
+                        </div>
+                        <h1 class="profile-name animate-fade-in animate-delay-2">{{user.first_name}} {{user.last_name}}</h1>
+                        <p class="profile-username animate-fade-in animate-delay-3">@{{user.username}}</p>
+                        <p class="profile-id animate-fade-in animate-delay-4">ID: #{{user.id}}</p>
+                    </div>
+
+                    <!-- Profile Body -->
+                    <div class="profile-body">
+                        <!-- Action Buttons -->
+                        <div class="profile-actions animate-slide-up animate-delay-1">
+                            <a href="/change_user_password?u_id={{user.id}}" class="action-btn">
+                                <i class="fas fa-key"></i>
+                                Change Password
+                            </a>
+                            <a href="/delete_user?u_id={{user.id}}" class="action-btn danger">
+                                <i class="fas fa-trash-alt"></i>
+                                Delete Profile
+                            </a>
+                        </div>
+
+                        <!-- Profile Info -->
+                        <div class="profile-info animate-slide-up animate-delay-2">
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <div class="info-icon">
+                                        <i class="fas fa-dumbbell"></i>
+                                    </div>
+                                    <div class="info-label">Fitness Level</div>
+                                    <div class="info-value">{{user.muscle_strength}} Level</div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-icon">
+                                        <i class="fas fa-calendar-alt"></i>
+                                    </div>
+                                    <div class="info-label">Workout Split</div>
+                                    <div class="info-value">{{user.gym_split}}</div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-icon">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                    </div>
+                                    <div class="info-label">Location</div>
+                                    <div class="info-value">{{user.address}}, Lahore</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Statistics -->
+                        <div class="stats-container animate-slide-up animate-delay-3">
+                            <div class="stat-card">
+                                <div class="stat-number">{{user.no_of_days}}</div>
+                                <div class="stat-label">Days Attended</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number">{{bmi}}</div>
+                                <div class="stat-label">BMI Score</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number 
+                                    {% if bmi_status == 'Underweight' %}bmi-underweight
+                                    {% elif bmi_status == 'Normal' %}bmi-normal
+                                    {% elif bmi_status == 'Overweight' %}bmi-overweight
+                                    {% else %}bmi-obese{% endif %}">
+                                    {{bmi_status}}
+                                </div>
+                                <div class="stat-label">BMI Status</div>
+                            </div>
+                        </div>
+
+                        <!-- Call-to-Action Section -->
+                        <div class="cta-section animate-slide-up animate-delay-4">
+                            <div class="cta-card">
+                                <div class="cta-icon">
+                                    <i class="fas fa-play"></i>
+                                </div>
+                                <h3 class="cta-title">Today's Workout</h3>
+                                <p class="text-secondary mb-3">Ready to crush your {{today}} workout session?</p>
+                                <a href="/workout_plan?pid={{user.id}}" class="cta-btn">
+                                    Start Exercise
+                                </a>
+                            </div>
+                            <div class="cta-card">
+                                <div class="cta-icon">
+                                    <i class="fas fa-utensils"></i>
+                                </div>
+                                <h3 class="cta-title">Diet Plan</h3>
+                                <p class="text-secondary mb-3">Check your personalized nutrition plan</p>
+                                <a href="/diet_plan" class="cta-btn secondary">
+                                    View Diet Plan
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
-  <div class="theme-switcher-wrapper" id="theme-switcher-wrapper"><span>Themes color</span>
-    <ul>
-      <li><em class="is-active" data-theme="orange"></em></li>
-      <li><em data-theme="green"></em></li>
-      <li><em data-theme="purple"></em></li>
-      <li><em data-theme="blue"></em></li>
-    </ul>
-  </div>
-  <div class="theme-switcher-button" id="theme-switcher-button">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">
-      <path fill="currentColor" d="M352 0H32C14.33 0 0 14.33 0 32v224h384V32c0-17.67-14.33-32-32-32zM0 320c0 35.35 28.66 64 64 64h64v64c0 35.35 28.66 64 64 64s64-28.65 64-64v-64h64c35.34 0 64-28.65 64-64v-32H0v32zm192 104c13.25 0 24 10.74 24 24 0 13.25-10.75 24-24 24s-24-10.75-24-24c0-13.26 10.75-24 24-24z"></path>
-    </svg>
-  </div>
 </div>
+
+<!-- Theme Switcher -->
+<div class="theme-switcher animate-fade-in">
+    <div class="theme-colors">
+        <div class="theme-color theme-orange active" data-theme="orange"></div>
+        <div class="theme-color theme-green" data-theme="green"></div>
+        <div class="theme-color theme-purple" data-theme="purple"></div>
+        <div class="theme-color theme-blue" data-theme="blue"></div>
+    </div>
+</div>
+
+<!-- Upload Modal -->
+<div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="uploadModalLabel">Update Profile Picture</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="avatar-form" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="text-center mb-4">
+                        <img id="upload-preview" class="upload-preview" src="{{user.image.url}}" alt="Preview">
+                    </div>
+                    <div class="mb-3">
+                        <label for="image-upload" class="form-label">Select New Image</label>
+                        <input class="form-control" type="file" id="image-upload" name="image" accept="image/*" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary upload-btn" id="upload-submit">Upload Picture</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Theme Switching Functionality
+    const themeColors = document.querySelectorAll('.theme-color');
+    const root = document.documentElement;
+
+    const themes = {
+        orange: {
+            primary: 'linear-gradient(135deg, #ff6b35 0%, #f7931e 100%)',
+            secondary: 'linear-gradient(135deg, #ff9a56 0%, #ff6b35 100%)',
+            accent: 'linear-gradient(135deg, #ff8c42 0%, #fd79a8 100%)',
+            success: 'linear-gradient(135deg, #00b894 0%, #00cec9 100%)',
+            warning: 'linear-gradient(135deg, #fdcb6e 0%, #e17055 100%)',
+            danger: 'linear-gradient(135deg, #fd79a8 0%, #e84393 100%)'
+        },
+        green: {
+            primary: 'linear-gradient(135deg, #2ed573 0%, #17c0eb 100%)',
+            secondary: 'linear-gradient(135deg, #7bed9f 0%, #70a1ff 100%)',
+            accent: 'linear-gradient(135deg, #5f27cd 0%, #00d2d3 100%)',
+            success: 'linear-gradient(135deg, #2ed573 0%, #17c0eb 100%)',
+            warning: 'linear-gradient(135deg, #ff9ff3 0%, #f368e0 100%)',
+            danger: 'linear-gradient(135deg, #ff3838 0%, #ff6b6b 100%)'
+        },
+        purple: {
+            primary: 'linear-gradient(135deg, #a55eea 0%, #26de81 100%)',
+            secondary: 'linear-gradient(135deg, #fd79a8 0%, #a29bfe 100%)',
+            accent: 'linear-gradient(135deg, #6c5ce7 0%, #fd79a8 100%)',
+            success: 'linear-gradient(135deg, #00b894 0%, #55a3ff 100%)',
+            warning: 'linear-gradient(135deg, #ffeaa7 0%, #fab1a0 100%)',
+            danger: 'linear-gradient(135deg, #e17055 0%, #fd79a8 100%)'
+        },
+        blue: {
+            primary: 'linear-gradient(135deg, #3742fa 0%, #2f3542 100%)',
+            secondary: 'linear-gradient(135deg, #70a1ff 0%, #5352ed 100%)',
+            accent: 'linear-gradient(135deg, #3742fa 0%, #40407a 100%)',
+            success: 'linear-gradient(135deg, #7bed9f 0%, #70a1ff 100%)',
+            warning: 'linear-gradient(135deg, #ffa502 0%, #ff6348 100%)',
+            danger: 'linear-gradient(135deg, #ff4757 0%, #c44569 100%)'
+        }
+    };
+
+    function applyTheme(themeName) {
+        const theme = themes[themeName];
+        if (theme) {
+            root.style.setProperty('--primary-gradient', theme.primary);
+            root.style.setProperty('--secondary-gradient', theme.secondary);
+            root.style.setProperty('--accent-gradient', theme.accent);
+            root.style.setProperty('--success-gradient', theme.success);
+            root.style.setProperty('--warning-gradient', theme.warning);
+            root.style.setProperty('--danger-gradient', theme.danger);
+            
+            // Update active theme
+            themeColors.forEach(color => color.classList.remove('active'));
+            document.querySelector(`[data-theme="${themeName}"]`).classList.add('active');
+            
+            // Store preference
+            localStorage.setItem('preferred-theme', themeName);
+        }
+    }
+
+    // Theme color click handlers
+    themeColors.forEach(color => {
+        color.addEventListener('click', () => {
+            const theme = color.dataset.theme;
+            applyTheme(theme);
+        });
+    });
+
+    // Load saved theme
+    const savedTheme = localStorage.getItem('preferred-theme');
+    if (savedTheme && themes[savedTheme]) {
+        applyTheme(savedTheme);
+    }
+
+    // Profile picture upload functionality
+    const avatarContainer = document.getElementById('avatar-container');
+    const profileAvatar = document.getElementById('profile-avatar');
+    const imageUpload = document.getElementById('image-upload');
+    const uploadPreview = document.getElementById('upload-preview');
+    const uploadModal = new bootstrap.Modal(document.getElementById('uploadModal'));
+    const uploadSubmit = document.getElementById('upload-submit');
+    const avatarForm = document.getElementById('avatar-form');
+
+    // Click on avatar to open upload modal
+    avatarContainer.addEventListener('click', () => {
+        uploadModal.show();
+    });
+
+    // Preview image when file is selected
+    imageUpload.addEventListener('change', function() {
+        const file = this.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                uploadPreview.src = e.target.result;
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Submit the form via AJAX
+    uploadSubmit.addEventListener('click', function() {
+        const fileInput = document.getElementById('image-upload');
+        const file = fileInput.files[0];
         
-      </main>
-      
-      
-      <!-- Java Script  -->
-      <script src="{% static '/js/script_of_profilePage.js' %}" ></script>
-      
-   </body>
-</html>
+        if (!file) {
+            showNotification('Please select an image file first.', 'error');
+            return;
+        }
+        
+        // Validate file type
+        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+        if (!allowedTypes.includes(file.type)) {
+            showNotification('Invalid file type. Please upload JPEG, PNG, GIF, or WebP images.', 'error');
+            return;
+        }
+        
+        // Validate file size (5MB limit)
+        if (file.size > 5 * 1024 * 1024) {
+            showNotification('File too large. Please upload images smaller than 5MB.', 'error');
+            return;
+        }
+        
+        // Show loading state
+        uploadSubmit.textContent = 'Uploading...';
+        uploadSubmit.disabled = true;
+        
+        const formData = new FormData();
+        formData.append('image', file);
+        formData.append('user_id', '{{user.id}}');
+        
+        // Get CSRF token from the form
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        
+        fetch('/upload_profile_image/', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': csrfToken,
+            },
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                // Update the profile image with the new one
+                profileAvatar.src = data.image_url + '?t=' + new Date().getTime();
+                uploadPreview.src = data.image_url + '?t=' + new Date().getTime();
+                uploadModal.hide();
+                
+                // Show success notification
+                showNotification(data.message || 'Profile picture updated successfully!', 'success');
+            } else {
+                showNotification('Error: ' + data.message, 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Upload error:', error);
+            showNotification('An error occurred while uploading the image: ' + error.message, 'error');
+        })
+        .finally(() => {
+            // Reset button state
+            uploadSubmit.textContent = 'Upload Picture';
+            uploadSubmit.disabled = false;
+        });
+    });
+
+    // Show notification function
+    function showNotification(message, type) {
+        // Create notification element
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        notification.innerHTML = `
+            <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} notification-icon"></i>
+            <div>${message}</div>
+        `;
+        
+        // Add to body
+        document.body.appendChild(notification);
+        
+        // Show notification
+        setTimeout(() => {
+            notification.classList.add('show');
+        }, 10);
+        
+        // Remove after 3 seconds
+        setTimeout(() => {
+            notification.classList.remove('show');
+            setTimeout(() => {
+                notification.remove();
+            }, 300);
+        }, 3000);
+    }
+
+    // Enhanced hover effects for cards
+    const cards = document.querySelectorAll('.stat-card, .cta-card, .action-btn, .info-item');
+    
+    cards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-8px) scale(1.02)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0) scale(1)';
+        });
+    });
+
+    // Progressive enhancement for animations
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.animation = entry.target.style.animation || 'slideInUp 0.8s ease-out';
+                entry.target.style.opacity = '1';
+            }
+        });
+    }, observerOptions);
+
+    // Observe elements for scroll animations
+    document.querySelectorAll('.stat-card, .cta-card, .profile-info').forEach(el => {
+        observer.observe(el);
+    });
+
+    // Enhanced button interactions with ripple effect
+    const buttons = document.querySelectorAll('.cta-btn, .action-btn');
+    
+    buttons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            // Create ripple effect
+            const ripple = document.createElement('span');
+            const rect = this.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            const x = e.clientX - rect.left - size / 2;
+            const y = e.clientY - rect.top - size / 2;
+            
+            ripple.style.width = ripple.style.height = size + 'px';
+            ripple.style.left = x + 'px';
+            ripple.style.top = y + 'px';
+            ripple.classList.add('ripple');
+            
+            this.appendChild(ripple);
+            
+            setTimeout(() => {
+                ripple.remove();
+            }, 600);
+        });
+    });
+
+    // Add ripple CSS
+    const rippleCSS = `
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(0);
+            animation: ripple-animation 0.6s linear;
+            pointer-events: none;
+        }
+        
+        @keyframes ripple-animation {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+    `;
+    
+    const style = document.createElement('style');
+    style.textContent = rippleCSS;
+    document.head.appendChild(style);
+
+    // Dynamic stats counter animation
+    function animateCounter(element, target, duration = 2000) {
+        const start = 0;
+        const startTime = performance.now();
+        
+        function updateCounter(currentTime) {
+            const elapsedTime = currentTime - startTime;
+            const progress = Math.min(elapsedTime / duration, 1);
+            
+            const currentValue = Math.floor(progress * target);
+            element.textContent = currentValue;
+            
+            if (progress < 1) {
+                requestAnimationFrame(updateCounter);
+            }
+        }
+        
+        requestAnimationFrame(updateCounter);
+    }
+
+    // Animate BMI and days when visible
+    const statNumbers = document.querySelectorAll('.stat-number');
+    const statsObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const target = entry.target;
+                const value = parseFloat(target.textContent);
+                
+                if (!isNaN(value)) {
+                    animateCounter(target, value);
+                    statsObserver.unobserve(target);
+                }
+            }
+        });
+    });
+
+    statNumbers.forEach(stat => {
+        const value = parseFloat(stat.textContent);
+        if (!isNaN(value)) {
+            stat.textContent = '0';
+            statsObserver.observe(stat);
+        }
+    });
+
+    // Error handling for missing images
+    document.querySelectorAll('img').forEach(img => {
+        img.addEventListener('error', function() {
+            this.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEyIDJDNi40OCAyIDIgNi40OCAyIDEyUzYuNDggMjIgMTIgMjJTMjIgMTcuNTIgMjIgMTJTMTcuNTIgMiAxMiAyWk0xMyAxN0gxMVYxNUgxM1YxN1pNMTMgMTNIMTFWN0gxM1YxM1oiIGZpbGw9IiM2NjZiNzMiLz4KPC9zdmc+';
+            this.style.backgroundColor = 'var(--bg-card)';
+        });
+    });
+
+    // Initialize animations on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add entrance animations
+        setTimeout(() => {
+            document.querySelectorAll('.animate-slide-up, .animate-fade-in').forEach((el, index) => {
+                el.style.opacity = '1';
+                el.style.transform = 'translateY(0)';
+            });
+        }, 100);
+        
+        // Initialize tooltips if Bootstrap is available
+        if (typeof bootstrap !== 'undefined') {
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        }
+    });
+
+    // Performance optimization: Debounce scroll events
+    let scrollTimeout;
+    window.addEventListener('scroll', () => {
+        if (scrollTimeout) {
+            clearTimeout(scrollTimeout);
+        }
+        
+        scrollTimeout = setTimeout(() => {
+            // Add scroll-based enhancements here if needed
+        }, 10);
+    });
+
+    // Keyboard accessibility
+    document.addEventListener('keydown', function(e) {
+        // ESC to close modal
+        if (e.key === 'Escape' && uploadModal._isShown) {
+            uploadModal.hide();
+        }
+        
+        // Enter to upload when modal is focused
+        if (e.key === 'Enter' && document.activeElement === uploadSubmit) {
+            uploadSubmit.click();
+        }
+    });
+
+    // Clean up event listeners on page unload
+    window.addEventListener('beforeunload', function() {
+        // Clean up observers
+        if (observer) observer.disconnect();
+        if (statsObserver) statsObserver.disconnect();
+    });
+</script>
+{% endblock %}

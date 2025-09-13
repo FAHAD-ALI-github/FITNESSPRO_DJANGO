@@ -1,77 +1,484 @@
+{% extends 'admin_base.html' %}
 {% load static %}
-<html lang="en">
-   <head>
-      <meta charset="utf-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1">
-      <title> {{a_user.first_name}} {{a_user.last_name}}'s Profile - Fitnesspro </title>
-      <!-- Style CSS -->
-      <link rel="stylesheet" href="{% static '/css/styles_of_profilePage.css' %}" >
-      <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;600&display=swap" rel="stylesheet">
-   </head>
-   <body>
-      
-      <main class="cd__main">
-         <div class="profile-page">
-  <div class="content">
-    <div class="content__cover">
-    
-    <div class="content__avatar" style="background: #d1d1d1"><img src="{{a_user.image.url}}" style="height: 100%; width: 100%; border-radius: 50%;"  ></div>
-      <div class="content__bull"><span></span><span></span><span></span><span></span><span></span>
-      </div>
-    </div>
-    <div class="content__actions"><a href="/all_members">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512">
-          <path fill="currentColor" d="M192 256A112 112 0 1 0 80 144a111.94 111.94 0 0 0 112 112zm76.8 32h-8.3a157.53 157.53 0 0 1-68.5 16c-24.6 0-47.6-6-68.5-16h-8.3A115.23 115.23 0 0 0 0 403.2V432a48 48 0 0 0 48 48h288a48 48 0 0 0 48-48v-28.8A115.23 115.23 0 0 0 268.8 288z"></path>
-          <path fill="currentColor" d="M480 256a96 96 0 1 0-96-96 96 96 0 0 0 96 96zm48 32h-3.8c-13.9 4.8-28.6 8-44.2 8s-30.3-3.2-44.2-8H432c-20.4 0-39.2 5.9-55.7 15.4 24.4 26.3 39.7 61.2 39.7 99.8v38.4c0 2.2-.5 4.3-.6 6.4H592a48 48 0 0 0 48-48 111.94 111.94 0 0 0-112-112z"></path>
-        </svg>
+
+{% block title %}{{a_user.first_name}} {{a_user.last_name}}'s Profile - FitnessPro Admin{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* User Profile Specific Styles */
+    .profile-container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .profile-header {
+        background: var(--bg-card);
+        backdrop-filter: var(--blur-md);
+        border: 1px solid var(--border-color);
+        border-radius: 2rem;
+        padding: 3rem 2rem;
+        margin-bottom: 2rem;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .profile-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--primary-gradient);
+    }
+
+    .profile-avatar {
+        width: 180px;
+        height: 180px;
+        border-radius: 50%;
+        margin: 0 auto 2rem;
+        border: 4px solid var(--accent-primary);
+        box-shadow: var(--shadow-glow);
+        object-fit: cover;
+        transition: all 0.3s ease;
+    }
+
+    .profile-avatar:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0 60px rgba(102, 126, 234, 0.4);
+    }
+
+    .profile-name {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 2.5rem;
+        font-weight: 700;
+        background: var(--primary-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 0.5rem;
+    }
+
+    .profile-username {
+        color: var(--text-secondary);
+        font-size: 1.2rem;
+        margin-bottom: 1rem;
+    }
+
+    .profile-id {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        background: var(--bg-tertiary);
+        padding: 0.5rem 1rem;
+        border-radius: 2rem;
+        display: inline-block;
+    }
+
+    .profile-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 2rem;
+        flex-wrap: wrap;
+    }
+
+    .action-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 2rem;
+        border-radius: 2rem;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .action-btn-primary {
+        background: var(--primary-gradient);
+        color: white;
+    }
+
+    .action-btn-primary:hover {
+        color: white;
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-glow);
+        filter: brightness(1.1);
+    }
+
+    .action-btn-danger {
+        background: var(--accent-danger);
+        color: white;
+    }
+
+    .action-btn-danger:hover {
+        color: white;
+        background: #ff3742;
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(255, 71, 87, 0.4);
+    }
+
+    .profile-details {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .detail-card {
+        background: var(--bg-card);
+        backdrop-filter: var(--blur-md);
+        border: 1px solid var(--border-color);
+        border-radius: 1.5rem;
+        padding: 2rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .detail-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--border-hover);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .detail-card h3 {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 1.3rem;
+        margin-bottom: 1.5rem;
+        color: var(--accent-primary);
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .detail-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 0;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .detail-item:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+
+    .detail-label {
+        color: var(--text-secondary);
+        font-weight: 500;
+    }
+
+    .detail-value {
+        color: var(--text-primary);
+        font-weight: 600;
+        text-align: right;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        background: var(--bg-card);
+        backdrop-filter: var(--blur-md);
+        border: 1px solid var(--border-color);
+        border-radius: 1.5rem;
+        padding: 2rem;
+        text-align: center;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        transition: all 0.3s ease;
+    }
+
+    .stat-card.attendance::before {
+        background: linear-gradient(135deg, #51cf66, #40c057);
+    }
+
+    .stat-card.bmi::before {
+        background: linear-gradient(135deg, #339af0, #228be6);
+    }
+
+    .stat-card.status::before {
+        background: var(--primary-gradient);
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .stat-value {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+        font-family: 'Space Grotesk', sans-serif;
+    }
+
+    .stat-label {
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+
+    .icon-wrapper {
+        width: 40px;
+        height: 40px;
+        background: var(--primary-gradient);
+        border-radius: 0.75rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .profile-header {
+            padding: 2rem 1rem;
+        }
+
+        .profile-name {
+            font-size: 2rem;
+        }
+
+        .profile-actions {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .action-btn {
+            width: 100%;
+            max-width: 300px;
+            justify-content: center;
+        }
+
+        .profile-details {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+        }
+
+        .profile-name {
+            font-size: 1.8rem;
+        }
+
+        .detail-card {
+            padding: 1.5rem;
+        }
+
+        .stat-card {
+            padding: 1.5rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="profile-container" data-aos="fade-up">
+    <!-- Profile Header -->
+    <div class="profile-header" data-aos="fade-up" data-aos-delay="100">
+        <img src="{{a_user.image.url}}" alt="{{a_user.first_name}} {{a_user.last_name}}" class="profile-avatar">
         
-      <span>Back to SeeAllMembers</span></a><a href="/delete?u_id={{a_user.id}}">
-        <span>DELETE USER</span></a></div>
-    <div class="content__title">
-      <h1>{{a_user.first_name}} {{a_user.last_name}}</h1><span>username : @{{a_user.username}}</span>
-      <pre></pre>
-      <span>id # {{a_user.id}}</span>
+        <h1 class="profile-name">{{a_user.first_name}} {{a_user.last_name}}</h1>
+        <p class="profile-username">@{{a_user.username}}</p>
+        <span class="profile-id">ID: #{{a_user.id}}</span>
+        
+        <div class="profile-actions">
+            <a href="/all_members" class="action-btn action-btn-primary">
+                <i class="fas fa-users"></i>
+                <span>Back to All Members</span>
+            </a>
+            <a href="/delete?u_id={{a_user.id}}" class="action-btn action-btn-danger" onclick="return confirm('Are you sure you want to delete this user? This action cannot be undone.')">
+                <i class="fas fa-trash-alt"></i>
+                <span>Delete User</span>
+            </a>
+        </div>
     </div>
-    <div class="content__description">
-      <p><b>{{a_user.muscle_strength}}</b> Level User</p>
-      <p>Do {{a_user.gym_split}}</p>
-      <p>Lives in {{a_user.address}}, Lahore</p>
+
+    <!-- Statistics Cards -->
+    <div class="stats-grid" data-aos="fade-up" data-aos-delay="200">
+        <div class="stat-card attendance">
+            <div class="stat-value">{{a_user.no_of_days}}</div>
+            <div class="stat-label">Total Attendance</div>
+        </div>
+        <div class="stat-card bmi">
+            <div class="stat-value">{{bmi}}</div>
+            <div class="stat-label">BMI Score</div>
+        </div>
+        <div class="stat-card status">
+            <div class="stat-value">{{bmi_status}}</div>
+            <div class="stat-label">BMI Status</div>
+        </div>
     </div>
-    <ul class="content__list">
-      <li><span>{{a_user.no_of_days}} days</span>TOTAL ATTENDANCE</li>
-      <li><span>{{bmi}}</span>BMI</li>
-      <li><span>{{bmi_status}}</span>BMI STATUS</li>
-      
-    </ul>
-    <!-- <div class="content__button"><a class="button" href="#">
-        <div class="button__border"></div>
-        <div class="button__bg"></div>
-        <p class="button__text">Show more</p></a></div> -->
-  </div>
-  <div class="bg">
-    <div><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+
+    <!-- Profile Details -->
+    <div class="profile-details" data-aos="fade-up" data-aos-delay="300">
+        <!-- Personal Information -->
+        <div class="detail-card">
+            <h3>
+                <div class="icon-wrapper">
+                    <i class="fas fa-user"></i>
+                </div>
+                Personal Information
+            </h3>
+            <div class="detail-item">
+                <span class="detail-label">First Name</span>
+                <span class="detail-value">{{a_user.first_name}}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Last Name</span>
+                <span class="detail-value">{{a_user.last_name}}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Username</span>
+                <span class="detail-value">@{{a_user.username}}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Address</span>
+                <span class="detail-value">{{a_user.address}}, Lahore</span>
+            </div>
+        </div>
+
+        <!-- Fitness Information -->
+        <div class="detail-card">
+            <h3>
+                <div class="icon-wrapper">
+                    <i class="fas fa-dumbbell"></i>
+                </div>
+                Fitness Profile
+            </h3>
+            <div class="detail-item">
+                <span class="detail-label">Muscle Strength</span>
+                <span class="detail-value">{{a_user.muscle_strength}} Level</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Gym Split</span>
+                <span class="detail-value">{{a_user.gym_split}}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Total Days Attended</span>
+                <span class="detail-value">{{a_user.no_of_days}} days</span>
+            </div>
+        </div>
+
+        <!-- Health Metrics -->
+        <div class="detail-card">
+            <h3>
+                <div class="icon-wrapper">
+                    <i class="fas fa-heartbeat"></i>
+                </div>
+                Health Metrics
+            </h3>
+            <div class="detail-item">
+                <span class="detail-label">BMI Score</span>
+                <span class="detail-value">{{bmi}}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">BMI Status</span>
+                <span class="detail-value">{{bmi_status}}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Member Since</span>
+                <span class="detail-value">{{a_user.date_joined|date:"M d, Y"}}</span>
+            </div>
+        </div>
+
+        <!-- Account Information -->
+        <div class="detail-card">
+            <h3>
+                <div class="icon-wrapper">
+                    <i class="fas fa-id-card"></i>
+                </div>
+                Account Details
+            </h3>
+            <div class="detail-item">
+                <span class="detail-label">User ID</span>
+                <span class="detail-value">#{{a_user.id}}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Account Status</span>
+                <span class="detail-value">
+                    {% if a_user.is_active %}
+                        <span style="color: var(--accent-success);">Active</span>
+                    {% else %}
+                        <span style="color: var(--accent-danger);">Inactive</span>
+                    {% endif %}
+                </span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Last Login</span>
+                <span class="detail-value">
+                    {% if a_user.last_login %}
+                        {{a_user.last_login|date:"M d, Y H:i"}}
+                    {% else %}
+                        Never
+                    {% endif %}
+                </span>
+            </div>
+        </div>
     </div>
-  </div>
-  <div class="theme-switcher-wrapper" id="theme-switcher-wrapper"><span>Themes color</span>
-    <ul>
-      <li><em class="is-active" data-theme="orange"></em></li>
-      <li><em data-theme="green"></em></li>
-      <li><em data-theme="purple"></em></li>
-      <li><em data-theme="blue"></em></li>
-    </ul>
-  </div>
-  <div class="theme-switcher-button" id="theme-switcher-button">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">
-      <path fill="currentColor" d="M352 0H32C14.33 0 0 14.33 0 32v224h384V32c0-17.67-14.33-32-32-32zM0 320c0 35.35 28.66 64 64 64h64v64c0 35.35 28.66 64 64 64s64-28.65 64-64v-64h64c35.34 0 64-28.65 64-64v-32H0v32zm192 104c13.25 0 24 10.74 24 24 0 13.25-10.75 24-24 24s-24-10.75-24-24c0-13.26 10.75-24 24-24z"></path>
-    </svg>
-  </div>
 </div>
-        
-      </main>
-      
-      
-      <!-- Java Script  -->
-      <script src="{% static '/js/script_of_profilePage.js' %}" ></script>
-      
-   </body>
-</html>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Add any additional JavaScript here if needed
+    document.addEventListener('DOMContentLoaded', function() {
+        // Enhanced hover effects for stat cards
+        const statCards = document.querySelectorAll('.stat-card');
+        statCards.forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-8px) scale(1.02)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+
+        // Smooth scroll to sections if needed
+        const profileActions = document.querySelectorAll('.profile-actions a');
+        profileActions.forEach(action => {
+            if (action.href.includes('#')) {
+                action.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({ 
+                            behavior: 'smooth',
+                            block: 'start' 
+                        });
+                    }
+                });
+            }
+        });
+    });
+</script>
+{% endblock %}

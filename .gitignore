@@ -33,4 +33,5 @@ Thumbs.db
 # --- Deployment Files ---
 PYTHONANYWHERE_DEPLOYMENT_GUIDE.md
 pythonanywhere_wsgi.py
+FITNESSPRO/settings_production.py
 

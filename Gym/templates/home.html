@@ -968,70 +968,54 @@
             </p>
         </div>
         
-        <div class="trainers-grid">
-            <div class="trainer-card" data-aos="fade-up" data-aos-delay="100">
-                <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Alex Johnson" class="trainer-image">
-                <h3 class="trainer-name">Alex Johnson</h3>
-                <div class="trainer-specialty">Strength & Conditioning</div>
-                <p class="trainer-bio">
-                    Former Olympic athlete with 10+ years of experience in strength training and athletic performance. 
-                    Specializes in powerlifting and functional movement patterns.
-                </p>
-                <div class="trainer-social">
-                    <a href="#" class="social-link">
-                        <i class="fab fa-facebook-f"></i>
-                    </a>
-                    <a href="#" class="social-link">
-                        <i class="fab fa-twitter"></i>
-                    </a>
-                    <a href="#" class="social-link">
-                        <i class="fab fa-instagram"></i>
-                    </a>
-                </div>
-            </div>
-            
-            <div class="trainer-card" data-aos="fade-up" data-aos-delay="200">
-                <img src="https://images.unsplash.com/photo-1594381898411-846e7d193883?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Sarah Williams" class="trainer-image">
-                <h3 class="trainer-name">Sarah Williams</h3>
-                <div class="trainer-specialty">Yoga & Wellness</div>
-                <p class="trainer-bio">
-                    Certified yoga instructor and wellness coach with expertise in mindfulness, flexibility, 
-                    and holistic health approaches. 500+ hour certified instructor.
-                </p>
-                <div class="trainer-social">
-                    <a href="#" class="social-link">
-                        <i class="fab fa-facebook-f"></i>
-                    </a>
-                    <a href="#" class="social-link">
-                        <i class="fab fa-twitter"></i>
-                    </a>
-                    <a href="#" class="social-link">
-                        <i class="fab fa-instagram"></i>
-                    </a>
-                </div>
-            </div>
-            
-            <div class="trainer-card" data-aos="fade-up" data-aos-delay="300">
-                <img src="https://images.unsplash.com/photo-1567013127542-490d757e51cd?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Mike Davis" class="trainer-image">
-                <h3 class="trainer-name">Mike Davis</h3>
-                <div class="trainer-specialty">HIIT & Cardio</div>
-                <p class="trainer-bio">
-                    High-intensity training specialist and former military fitness instructor. Expert in 
-                    cardiovascular conditioning and metabolic training programs.
-                </p>
-                <div class="trainer-social">
-                    <a href="#" class="social-link">
-                        <i class="fab fa-facebook-f"></i>
-                    </a>
-                    <a href="#" class="social-link">
-                        <i class="fab fa-twitter"></i>
-                    </a>
-                    <a href="#" class="social-link">
-                        <i class="fab fa-instagram"></i>
-                    </a>
-                </div>
-            </div>
+<div class="trainers-grid">
+    <div class="trainer-card" data-aos="fade-up" data-aos-delay="100">
+        <img src="{% static 'images/trainer1.jpg' %}" alt="Asad Ullah" class="trainer-image">
+        <h3 class="trainer-name">Asad Ullah</h3>
+        <div class="trainer-specialty">Strength & Conditioning</div>
+        <p class="trainer-bio">
+            Former Olympic athlete with 10+ years of experience in strength training and athletic performance.
+            Specializes in powerlifting and functional movement patterns.
+        </p>
+        <div class="trainer-social">
+            <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+            <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
         </div>
+    </div>
+
+    <div class="trainer-card" data-aos="fade-up" data-aos-delay="200">
+        <img src="{% static 'images/trainer2.jpg' %}" alt="Mohammad Ali" class="trainer-image">
+        <h3 class="trainer-name">Mohammad Ali</h3>
+        <div class="trainer-specialty">Yoga & Wellness</div>
+        <p class="trainer-bio">
+            Certified yoga instructor and wellness coach with expertise in mindfulness, flexibility,
+            and holistic health approaches. 500+ hour certified instructor.
+        </p>
+        <div class="trainer-social">
+            <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+            <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+        </div>
+    </div>
+
+    <div class="trainer-card" data-aos="fade-up" data-aos-delay="300">
+        <img src="{% static 'images/trainer3.jpg' %}" alt="Ibrahim Khan" class="trainer-image">
+        <h3 class="trainer-name">Ibrahim Khan</h3>
+        <div class="trainer-specialty">HIIT & Cardio</div>
+        <p class="trainer-bio">
+            High-intensity training specialist and former military fitness instructor. Expert in
+            cardiovascular conditioning and metabolic training programs.
+        </p>
+        <div class="trainer-social">
+            <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+            <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+        </div>
+    </div>
+</div>
+
+
     </div>
 </section>
 
@@ -1058,7 +1042,8 @@
                     Start Your Journey Today
                 </h3>
                 
-                <form id="contactForm">
+                <!-- only changes: added action + method -->
+                <form id="contactForm" action="https://formspree.io/f/myzdvnzn" method="POST" novalidate>
                     <div class="form-group">
                         <label class="form-label">Full Name</label>
                         <input type="text" class="form-control" name="name" placeholder="Enter your full name" required>
@@ -1082,11 +1067,15 @@
                     <button type="submit" class="submit-button">
                         <i class="fas fa-paper-plane me-2"></i>Send Message
                     </button>
+
+                    <!-- status and field-level errors will appear here -->
+                    <p id="formStatus" aria-live="polite" style="margin-top:15px; font-weight:600;"></p>
                 </form>
             </div>
         </div>
     </div>
 </section>
+
 {% endblock %}
 
 {% block extra_js %}
@@ -1145,7 +1134,104 @@ function calculateBMI() {
     
     showBMIResult(bmi.toFixed(1), category, description, color);
 }
+(function() {
+  const form = document.getElementById('contactForm');
+  const status = document.getElementById('formStatus');
 
+  // Remove old error messages
+  function clearErrors() {
+    form.querySelectorAll('[data-error-for]').forEach(el => el.remove());
+  }
+
+  // Show a field error under the related input/textarea
+  function showFieldError(fieldName, message) {
+    const field = form.querySelector('[name="' + fieldName + '"]');
+    if (!field) return;
+    const wrapper = document.createElement('div');
+    wrapper.setAttribute('data-error-for', fieldName);
+    wrapper.style.color = '#d9534f'; // red
+    wrapper.style.fontSize = '0.9rem';
+    wrapper.style.marginTop = '6px';
+    wrapper.textContent = message;
+    // insert after the field (works for input and textarea inside their .form-group)
+    if (field.parentNode) field.parentNode.appendChild(wrapper);
+    else field.insertAdjacentElement('afterend', wrapper);
+  }
+
+  form.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    status.textContent = '';
+    status.style.color = '';
+    clearErrors();
+
+    // simple client-side required check (keeps built-in HTML validation behavior out of the way)
+    // If browser validation is preferred remove the next lines.
+    const requiredFields = form.querySelectorAll('[required]');
+    for (const f of requiredFields) {
+      if (!f.value.trim()) {
+        showFieldError(f.name || 'field', 'This field is required.');
+        status.textContent = '❌ Please fix the errors below.';
+        status.style.color = 'red';
+        return;
+      }
+    }
+
+    const formData = new FormData(form);
+
+    try {
+      const res = await fetch(form.action, {
+        method: form.method || 'POST',
+        headers: { 'Accept': 'application/json' },
+        body: formData
+      });
+
+      if (res.ok) {
+        status.textContent = '✅ Your message has been sent successfully!';
+        status.style.color = 'green';
+        form.reset();
+        clearErrors();
+        return;
+      }
+
+      // If not ok, try to parse JSON (Formspree returns 422 with errors array)
+      const data = await res.json().catch(() => null);
+
+      if (data && data.errors && data.errors.length) {
+        status.textContent = '❌ Please fix the errors below.';
+        status.style.color = 'red';
+        data.errors.forEach(err => {
+          // Formspree error shape may vary; attempt several keys
+          const field = err.field || err.name || err.param || '';
+          const message = err.message || err.msg || err.error || 'Invalid input';
+          if (field) showFieldError(field, message);
+          else {
+            // fallback global error
+            const fallback = document.createElement('div');
+            fallback.setAttribute('data-error-for', 'global');
+            fallback.style.color = '#d9534f';
+            fallback.style.marginTop = '6px';
+            fallback.textContent = message;
+            status.parentNode?.insertBefore(fallback, status.nextSibling);
+          }
+        });
+        return;
+      }
+
+      // fallback error message
+      if (data && data.error) {
+        status.textContent = '❌ ' + data.error;
+        status.style.color = 'red';
+      } else {
+        status.textContent = '❌ Something went wrong. Please try again later.';
+        status.style.color = 'red';
+      }
+
+    } catch (err) {
+      status.textContent = '⚠️ Network error. Please check your connection.';
+      status.style.color = 'red';
+    }
+  });
+})();
 function showBMIResult(bmi, category, description, color) {
     const resultDiv = document.getElementById("result");
     const bmiValue = document.getElementById("bmiValue");

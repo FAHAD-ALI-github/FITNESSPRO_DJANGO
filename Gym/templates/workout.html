@@ -1,38 +1,767 @@
+{% extends 'parent.html' %}
 {% load static %}
 
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>YourMainExercises for {{today}}</title>
-  <link rel="stylesheet" href="{% static 'css/styles_of_dietplan.css' %}">
-</head>
-<body><center><h1>{{exercise}} EXERCISES</h1></center>
-  <div class="container" style="background-color: rgb(255, 255, 255);">
-    <div class="image-container">
-{% if exercise == 'chest' %}
-<img id="mainImage" src="{% static 'exercises/chest.png' %}" alt="Workout">
-{% elif exercise == 'back' %}
-<img id="mainImage" src="{% static 'exercises/back.png' %}" alt="Workout">
-{% elif exercise == 'shoulder' %}
-<img id="mainImage" src="{% static 'exercises/shoulder.png' %}" alt="Workout">
-{% elif exercise == 'bicep-tricep' %}
-<img id="mainImage" src="{% static 'exercises/bicep-tricep.png' %}" alt="Workout">
-{% elif exercise == 'leg' %}
-<img id="mainImage" src="{% static 'exercises/leg.png' %}" alt="Workout">
-{% elif exercise == 'push' %}
-<img id="mainImage" src="{% static 'exercises/push.png' %}" alt="Workout">
-{% elif exercise == 'pull' %}
-<img id="mainImage" src="{% static 'exercises/pull.png' %}" alt="Workout">
-{% endif %}
+{% block title %}{{exercise}} Exercises - {{today}} - FitnessPro{% endblock %}
 
+{% block extra_css %}
+<style>
+    /* Enhanced Background with Dynamic Effects */
+    .workout-background {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -2;
+        background: radial-gradient(ellipse at center, #1a1a1a 0%, #0a0a0a 100%);
+        overflow: hidden;
+    }
+
+    .dynamic-bg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0.6;
+    }
+
+    .bg-orb {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(40px);
+        animation: orbFloat 20s infinite ease-in-out;
+    }
+
+    .bg-orb:nth-child(1) {
+        width: 300px;
+        height: 300px;
+        background: radial-gradient(circle, rgba(102, 126, 234, 0.4), transparent);
+        top: 10%;
+        left: 10%;
+        animation-delay: 0s;
+    }
+
+    .bg-orb:nth-child(2) {
+        width: 200px;
+        height: 200px;
+        background: radial-gradient(circle, rgba(118, 75, 162, 0.3), transparent);
+        top: 60%;
+        right: 10%;
+        animation-delay: 7s;
+    }
+
+    .bg-orb:nth-child(3) {
+        width: 150px;
+        height: 150px;
+        background: radial-gradient(circle, rgba(0, 221, 235, 0.2), transparent);
+        bottom: 20%;
+        left: 20%;
+        animation-delay: 14s;
+    }
+
+    @keyframes orbFloat {
+        0%, 100% { transform: translate(0, 0) scale(1); }
+        25% { transform: translate(50px, -30px) scale(1.1); }
+        50% { transform: translate(-30px, 50px) scale(0.9); }
+        75% { transform: translate(-50px, -50px) scale(1.2); }
+    }
+
+    /* Main Container */
+    .exercise-container {
+        min-height: 100vh;
+        padding: 120px 0 80px;
+        position: relative;
+    }
+
+    /* Header Section */
+    .exercise-header {
+        text-align: center;
+        margin-bottom: 3rem;
+        position: relative;
+    }
+
+    .exercise-category {
+        display: inline-block;
+        padding: 0.8rem 2rem;
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 2rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--accent-primary);
+        margin-bottom: 1.5rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        position: relative;
+        overflow: hidden;
+        animation: slideDown 1s ease-out;
+    }
+
+    .exercise-category::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.2), transparent);
+        animation: shimmer 2s infinite 2s;
+    }
+
+    .main-title {
+    font-size: 2.5rem; /* Reduced from 4rem */
+    font-weight: 900;
+    margin-bottom: 1rem;
+    background: linear-gradient(135deg, #667eea, #764ba2, #00ddeb);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    position: relative;
+    animation: titleReveal 1.5s ease-out 0.3s both;
+}
+
+    .main-title::after {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: var(--primary-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        animation: textGlow 3s ease-in-out infinite alternate;
+    }
+
+    .date-display {
+        font-size: 1.2rem;
+        color: var(--text-secondary);
+        font-weight: 500;
+        animation: fadeInUp 1s ease-out 0.8s both;
+    }
+
+    @keyframes slideDown {
+        0% { opacity: 0; transform: translateY(-30px); }
+        100% { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes titleReveal {
+        0% { opacity: 0; transform: translateY(50px) scale(0.8); }
+        100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @keyframes textGlow {
+        0% { filter: brightness(1) drop-shadow(0 0 10px rgba(102, 126, 234, 0.3)); }
+        100% { filter: brightness(1.2) drop-shadow(0 0 30px rgba(102, 126, 234, 0.6)); }
+    }
+
+    @keyframes shimmer {
+        0% { left: -100%; }
+        100% { left: 100%; }
+    }
+
+    @keyframes fadeInUp {
+        0% { opacity: 0; transform: translateY(30px); }
+        100% { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Exercise Display Container */
+    .exercise-display {
+        max-width: 900px;
+        margin: 0 auto;
+        background: rgba(255, 255, 255, 0.03);
+        backdrop-filter: blur(25px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 3rem;
+        padding: 3rem;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 
+            0 25px 50px rgba(0, 0, 0, 0.3),
+            inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        animation: containerSlideIn 1s ease-out 0.5s both;
+    }
+
+    .exercise-display::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: var(--primary-gradient);
+        animation: progressBar 2s ease-out 1s both;
+    }
+
+    .exercise-display::after {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(102, 126, 234, 0.1) 0%, transparent 70%);
+        opacity: 0;
+        transition: opacity 0.5s ease;
+        animation: backgroundPulse 4s ease-in-out infinite 2s;
+    }
+
+    @keyframes containerSlideIn {
+        0% { opacity: 0; transform: translateY(80px) scale(0.9); }
+        100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @keyframes progressBar {
+        0% { transform: scaleX(0); }
+        100% { transform: scaleX(1); }
+    }
+
+    @keyframes backgroundPulse {
+        0%, 100% { opacity: 0; }
+        50% { opacity: 0.3; }
+    }
+
+    /* Exercise Image Container */
+    .image-container {
+        position: relative;
+        text-align: center;
+        margin-bottom: 2rem;
+        perspective: 1000px;
+    }
+
+    .exercise-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 2rem;
+    box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.4),
+        0 0 50px rgba(102, 126, 234, 0.2);
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    transform-style: preserve-3d;
+    animation: imageFloat 6s ease-in-out infinite;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    cursor: grab;
+    user-select: none;
+    background-color: white; 
+}
+
+    .exercise-image:hover {
+        transform: rotateY(5deg) rotateX(5deg) scale(1.05);
+        box-shadow: 
+            0 30px 60px rgba(0, 0, 0, 0.5),
+            0 0 80px rgba(102, 126, 234, 0.4);
+        border-color: rgba(102, 126, 234, 0.5);
+    }
+
+    .exercise-image:active {
+        cursor: grabbing;
+    }
+
+    @keyframes imageFloat {
+        0%, 100% { transform: translateY(0px) rotateZ(0deg); }
+        25% { transform: translateY(-10px) rotateZ(1deg); }
+        50% { transform: translateY(0px) rotateZ(0deg); }
+        75% { transform: translateY(-5px) rotateZ(-1deg); }
+    }
+
+    /* Exercise Info */
+    .exercise-info {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .exercise-description {
+        font-size: 1.3rem;
+        color: var(--text-secondary);
+        line-height: 1.8;
+        max-width: 600px;
+        margin: 0 auto 2rem;
+        position: relative;
+        padding: 1.5rem;
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 1.5rem;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .exercise-description::before {
+        content: '"';
+        position: absolute;
+        top: -10px;
+        left: 20px;
+        font-size: 4rem;
+        color: var(--accent-primary);
+        opacity: 0.3;
+        font-family: serif;
+    }
+
+    /* Control Panel */
+    .controls {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+        margin-top: 2rem;
+    }
+
+    .control-btn {
+        padding: 1rem 2rem;
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 1.5rem;
+        color: var(--text-primary);
+        font-weight: 600;
+        font-size: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+        min-width: 140px;
+    }
+
+    .control-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: var(--primary-gradient);
+        transition: left 0.3s ease;
+        opacity: 0.8;
+    }
+
+    .control-btn span {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .control-btn:hover {
+        transform: translateY(-3px);
+        border-color: rgba(102, 126, 234, 0.5);
+        box-shadow: 
+            0 10px 30px rgba(102, 126, 234, 0.3),
+            0 0 50px rgba(102, 126, 234, 0.2);
+    }
+
+    .control-btn:hover::before {
+        left: 0;
+    }
+
+    .control-btn:active {
+        transform: translateY(-1px);
+    }
+
+    .zoom-in-btn {
+        background: linear-gradient(135deg, rgba(46, 213, 115, 0.1), rgba(0, 184, 169, 0.1));
+        border-color: rgba(46, 213, 115, 0.3);
+    }
+
+    .zoom-in-btn:hover {
+        border-color: rgba(46, 213, 115, 0.6);
+        box-shadow: 
+            0 10px 30px rgba(46, 213, 115, 0.3),
+            0 0 50px rgba(46, 213, 115, 0.2);
+    }
+
+    .zoom-out-btn {
+        background: linear-gradient(135deg, rgba(255, 71, 87, 0.1), rgba(255, 165, 2, 0.1));
+        border-color: rgba(255, 71, 87, 0.3);
+    }
+
+    .zoom-out-btn:hover {
+        border-color: rgba(255, 71, 87, 0.6);
+        box-shadow: 
+            0 10px 30px rgba(255, 71, 87, 0.3),
+            0 0 50px rgba(255, 71, 87, 0.2);
+    }
+
+    /* Enhanced Stats Section */
+    .exercise-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin: 3rem 0;
+    }
+
+    .stat-card {
+        background: rgba(255, 255, 255, 0.03);
+        backdrop-filter: blur(15px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 1.5rem;
+        padding: 1.5rem;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: var(--accent-gradient);
+        transform: scaleX(0);
+        transition: transform 0.3s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .stat-card:hover::before {
+        transform: scaleX(1);
+    }
+
+    .stat-icon {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        background: var(--primary-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 800;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+        color: var(--text-secondary);
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-size: 0.9rem;
+    }
+
+    /* Progress Indicator */
+    .progress-indicator {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: rgba(255, 255, 255, 0.1);
+        z-index: 1040;
+    }
+
+    .progress-bar {
+        height: 100%;
+        background: var(--primary-gradient);
+        width: 0%;
+        transition: width 0.3s ease;
+        box-shadow: 0 0 20px rgba(102, 126, 234, 0.5);
+    }
+
+    /* Loading Animation */
+    .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: var(--bg-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        opacity: 1;
+        transition: opacity 0.5s ease;
+    }
+
+    .loading-spinner {
+        width: 60px;
+        height: 60px;
+        border: 3px solid rgba(102, 126, 234, 0.3);
+        border-top: 3px solid var(--accent-primary);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    /* Success Message Animation */
+    @keyframes slideInRight {
+        0% { transform: translateX(100%); opacity: 0; }
+        100% { transform: translateX(0); opacity: 1; }
+    }
+    
+    @keyframes fadeOut {
+        0% { opacity: 1; }
+        100% { opacity: 0; }
+    }
+
+    /* Notification Toast */
+    .toast-notification {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: rgba(46, 213, 115, 0.9);
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 10px;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
+        z-index: 10000;
+        font-weight: 600;
+    }
+
+    .toast-notification.show {
+        transform: translateX(0);
+        animation: slideInRight 0.3s ease-out;
+    }
+
+    .toast-notification.hide {
+        animation: fadeOut 0.3s ease-out;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+    .main-title {
+        font-size: 2rem; 
+        letter-spacing: 2px;
+    }
+
+        .exercise-display {
+            margin: 1rem;
+            padding: 2rem;
+            border-radius: 2rem;
+        }
+
+        .controls {
+            gap: 1rem;
+            flex-direction: column;
+        }
+
+        .control-btn {
+            width: 100%;
+            max-width: 280px;
+        }
+
+        .exercise-stats {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .exercise-container {
+            padding: 100px 0 60px;
+        }
+
+        .main-title {
+        font-size: 1.5rem; 
+    }
+        .exercise-display {
+            padding: 1.5rem;
+        }
+
+        .exercise-description {
+            font-size: 1.1rem;
+            padding: 1rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="workout-background">
+    <div class="dynamic-bg">
+        <div class="bg-orb"></div>
+        <div class="bg-orb"></div>
+        <div class="bg-orb"></div>
     </div>
-    <div class="controls">
-      <button id="zoomIn">Zoom In</button>
-      <button id="zoomOut">Zoom Out</button>
-      <a id="downloadLink" download="dietplan.png" href="#">Download</a>
+</div>
+
+<div class="progress-indicator">
+    <div class="progress-bar" id="progressBar"></div>
+</div>
+
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner"></div>
+</div>
+
+<div class="exercise-container">
+    <div class="container">
+        <div class="exercise-header" data-aos="fade-down">
+            <div class="exercise-category">{{exercise|upper}}</div>
+            <h1 class="main-title">{{exercise|upper}} Exercises</h1>  <!-- Added "Exercises" here explicitly -->
+            <p class="date-display">Training Session - {{today}}</p>
+        </div>
+
+        <div class="exercise-display" data-aos="zoom-in" data-aos-delay="300">
+            <div class="image-container">
+                {% if exercise == 'chest' %}
+                    <img id="mainImage" src="{% static 'exercises/chest.png' %}" alt="Chest Workout" class="exercise-image">
+                {% elif exercise == 'back' %}
+                    <img id="mainImage" src="{% static 'exercises/back.png' %}" alt="Back Workout" class="exercise-image">
+                {% elif exercise == 'shoulder' %}
+                    <img id="mainImage" src="{% static 'exercises/shoulder.png' %}" alt="Shoulder Workout" class="exercise-image">
+                {% elif exercise == 'bicep-tricep' %}
+                    <img id="mainImage" src="{% static 'exercises/bicep-tricep.png' %}" alt="Bicep-Tricep Workout" class="exercise-image">
+                {% elif exercise == 'leg' %}
+                    <img id="mainImage" src="{% static 'exercises/leg.png' %}" alt="Leg Workout" class="exercise-image">
+                {% elif exercise == 'push' %}
+                    <img id="mainImage" src="{% static 'exercises/push.png' %}" alt="Push Workout" class="exercise-image">
+                {% elif exercise == 'pull' %}
+                    <img id="mainImage" src="{% static 'exercises/pull.png' %}" alt="Pull Workout" class="exercise-image">
+                {% endif %}
+            </div>
+
+            <div class="exercise-info">
+                <p class="exercise-description">
+                    {% if exercise == 'chest' %}
+                        Sculpt a powerful chest with this comprehensive training routine. These exercises target your pectorals from multiple angles, building strength, size, and definition for an impressive upper body transformation.
+                    {% elif exercise == 'back' %}
+                        Build a strong, wide back with this expertly designed workout. Focus on proper form and mind-muscle connection to develop the powerful V-taper that defines a strong physique.
+                    {% elif exercise == 'shoulder' %}
+                        Develop boulder shoulders with this complete deltoid workout. Target all three heads of your shoulders for balanced development, improved posture, and enhanced upper body strength.
+                    {% elif exercise == 'bicep-tricep' %}
+                        Maximize your arm development with this intense bicep and tricep combination. Build impressive arm size and strength with these proven exercises that target every fiber of your arm muscles.
+                    {% elif exercise == 'leg' %}
+                        Transform your lower body with this comprehensive leg workout. Build powerful quads, hamstrings, glutes, and calves for improved athletic performance and overall strength.
+                    {% elif exercise == 'push' %}
+                        Master the art of pushing movements with this dynamic workout. Target your chest, shoulders, and triceps in one powerful session that builds functional strength and muscle mass.
+                    {% elif exercise == 'pull' %}
+                        Develop a strong, defined back and biceps with this pulling-focused routine. Build the strength and muscle mass needed for a balanced, powerful physique.
+                    {% endif %}
+                </p>
+            </div>
+
+            <div class="exercise-stats" data-aos="fade-up" data-aos-delay="600">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                    <div class="stat-value">45-60</div>
+                    <div class="stat-label">Minutes</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-fire"></i></div>
+                    <div class="stat-value">350+</div>
+                    <div class="stat-label">Calories</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-dumbbell"></i></div>
+                    <div class="stat-value">8-12</div>
+                    <div class="stat-label">Exercises</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
+                    <div class="stat-value">High</div>
+                    <div class="stat-label">Intensity</div>
+                </div>
+            </div>
+
+            
+        </div>
     </div>
-  </div>
-  <script src="{% static 'js/script_of_dietplan.js' %}"></script>
-</body>
-</html>
+</div>
+{% endblock %}
+
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Hide loading overlay after page loads
+        setTimeout(() => {
+            const overlay = document.getElementById('loadingOverlay');
+            if (overlay) {
+                overlay.style.opacity = '0';
+                setTimeout(() => {
+                    overlay.style.display = 'none';
+                }, 500);
+            }
+        }, 1500);
+
+        // Progress bar animation
+        const progressBar = document.getElementById('progressBar');
+        if (progressBar) {
+            setTimeout(() => {
+                progressBar.style.width = '100%';
+            }, 1000);
+        }
+
+        
+
+        // Toast notification helper
+        function showToast(message) {
+            const existingToast = document.querySelector('.toast-notification');
+            if (existingToast) {
+                existingToast.remove();
+            }
+
+            const toast = document.createElement('div');
+            toast.className = 'toast-notification';
+            toast.innerHTML = `<i class="fas fa-check-circle" style="margin-right: 8px;"></i> ${message}`;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.add('show');
+            }, 100);
+
+            setTimeout(() => {
+                toast.classList.add('hide');
+                setTimeout(() => {
+                    if (toast.parentNode) {
+                        toast.parentNode.removeChild(toast);
+                    }
+                }, 300);
+            }, 3000);
+        }
+
+        // Button click feedback
+        function addButtonFeedback(button) {
+            if (button) {
+                button.style.transform = 'translateY(-1px) scale(0.95)';
+                button.style.boxShadow = '0 5px 15px rgba(102, 126, 234, 0.4)';
+                setTimeout(() => {
+                    button.style.transform = '';
+                    button.style.boxShadow = '';
+                }, 150);
+            }
+        }
+
+        // Scroll progress indicator throttle
+        let scrollTimer;
+        window.addEventListener('scroll', function() {
+            if (scrollTimer) {
+                clearTimeout(scrollTimer);
+            }
+            scrollTimer = setTimeout(() => {
+                if (progressBar) {
+                    const scrolled = window.pageYOffset;
+                    const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+                    const scrollProgress = maxScroll > 0 ? (scrolled / maxScroll) * 100 : 0;
+                    progressBar.style.width = scrollProgress + '%';
+                }
+            }, 10);
+        });
+
+        console.log('Exercise page loaded successfully');
+    });
+</script>
+{% endblock %}

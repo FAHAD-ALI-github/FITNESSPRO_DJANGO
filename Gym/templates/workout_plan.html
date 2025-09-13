@@ -1,162 +1,627 @@
+{% extends 'parent.html' %}
 {% load static %}
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>{{today}}'s Workout Plan</title>
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+
+{% block title %}{{today}}'s Workout Plan - FitnessPro{% endblock %}
+
+{% block extra_css %}
 <style>
-  body {
-    margin: 0;
-    padding: 0;
-    font-family: 'Roboto', sans-serif;
-    background-color: #f9f9f9;
-    color: #333;
-  }
-  .container {
-    max-width: 800px;
-    margin: 20px auto;
-    padding: 20px;
-    background: linear-gradient(45deg, #fafafa, #f0f0f0);
-    border-radius: 20px;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-    transition: all 0.3s ease;
-  }
-  .container:hover {
-    transform: scale(1.01);
-  }
-  h1, h2 {
-    text-align: center;
-    margin-bottom: 20px;
-    font-weight: 700;
-    color: #222;
-  }
-  h2 {
-    border-bottom: 2px solid #ddd;
-    padding-bottom: 10px;
-  }
-  .exercise {
-    margin-bottom: 30px;
-    padding: 20px;
-    background-color: #fff;
-    border-radius: 20px;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-  }
-  .exercise:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
-  }
-  .exercise h3 {
-    margin-bottom: 10px;
-    color: #555;
-    font-size: 24px;
-  }
-  .exercise p {
-    color: #777;
-    font-size: 18px;
-    line-height: 1.6;
-  }
-  .exercise img {
-    max-width: 100%;
-    height: auto;
-    display: block;
-    margin: 0 auto 10px;
-    border-radius: 20px;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-  }
-  .exercise img:hover {
-    transform: scale(1.05);
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
-  }
+    /* Animated Background */
+    .workout-background {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        overflow: hidden;
+        background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0a0a0a 100%);
+    }
 
-  .button-64 {
-  align-items: center;
-  background-image: linear-gradient(144deg,#AF40FF, #5B42F3 50%,#00DDEB);
-  border: 0;
-  border-radius: 8px;
-  box-shadow: rgba(151, 65, 252, 0.2) 0 15px 30px -5px;
-  box-sizing: border-box;
-  color: #FFFFFF;
-  display: flex;
-  font-family: Phantomsans, sans-serif;
-  font-size: 20px;
-  justify-content: center;
-  line-height: 1em;
-  max-width: 100%;
-  min-width: 140px;
-  padding: 3px;
-  text-decoration: none;
-  user-select: none;
-  -webkit-user-select: none;
-  touch-action: manipulation;
-  white-space: nowrap;
-  cursor: pointer;
-}
+    .workout-background::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 200%;
+        height: 200%;
+        background: 
+            radial-gradient(circle at 20% 80%, rgba(102, 126, 234, 0.1) 0%, transparent 50%),
+            radial-gradient(circle at 80% 20%, rgba(118, 75, 162, 0.1) 0%, transparent 50%),
+            radial-gradient(circle at 40% 40%, rgba(0, 221, 235, 0.05) 0%, transparent 50%);
+        animation: backgroundFloat 20s ease-in-out infinite;
+    }
 
-.button-64:active,
-.button-64:hover {
-  outline: 0;
-}
+    .floating-particles {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+    }
 
-.button-64 span {
-  background-color: rgb(5, 6, 45);
-  padding: 16px 24px;
-  border-radius: 6px;
-  width: 100%;
-  height: 100%;
-  transition: 300ms;
-}
+    .particle {
+        position: absolute;
+        background: linear-gradient(45deg, rgba(102, 126, 234, 0.4), rgba(118, 75, 162, 0.4));
+        border-radius: 50%;
+        animation: particleFloat 15s infinite ease-in-out;
+    }
 
-.button-64:hover span {
-  background: none;
-}
+    .particle:nth-child(1) { width: 4px; height: 4px; left: 10%; animation-delay: 0s; }
+    .particle:nth-child(2) { width: 6px; height: 6px; left: 20%; animation-delay: 2s; }
+    .particle:nth-child(3) { width: 3px; height: 3px; left: 30%; animation-delay: 4s; }
+    .particle:nth-child(4) { width: 5px; height: 5px; left: 40%; animation-delay: 1s; }
+    .particle:nth-child(5) { width: 4px; height: 4px; left: 50%; animation-delay: 3s; }
+    .particle:nth-child(6) { width: 7px; height: 7px; left: 60%; animation-delay: 5s; }
+    .particle:nth-child(7) { width: 3px; height: 3px; left: 70%; animation-delay: 1.5s; }
+    .particle:nth-child(8) { width: 5px; height: 5px; left: 80%; animation-delay: 3.5s; }
+    .particle:nth-child(9) { width: 4px; height: 4px; left: 90%; animation-delay: 2.5s; }
 
-@media (min-width: 768px) {
-  .button-64 {
-    font-size: 24px;
-    min-width: 196px;
-  }
-}
+    @keyframes backgroundFloat {
+        0%, 100% { transform: translate(0, 0) rotate(0deg); }
+        33% { transform: translate(-20px, -20px) rotate(120deg); }
+        66% { transform: translate(20px, -10px) rotate(240deg); }
+    }
+
+    @keyframes particleFloat {
+        0%, 100% { transform: translateY(100vh) scale(0); opacity: 0; }
+        10% { opacity: 1; }
+        90% { opacity: 1; }
+        50% { transform: translateY(-10vh) scale(1); }
+    }
+
+    /* Main Content Styling */
+    .workout-container {
+        min-height: 100vh;
+        padding: 120px 0 80px;
+        position: relative;
+    }
+
+    .workout-header {
+        text-align: center;
+        margin-bottom: 4rem;
+        position: relative;
+    }
+
+    .workout-title {
+        font-size: 3.5rem;
+        font-weight: 800;
+        margin-bottom: 1rem;
+        background: var(--primary-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-shadow: 0 0 30px rgba(102, 126, 234, 0.3);
+        animation: titleGlow 3s ease-in-out infinite alternate;
+        position: relative;
+    }
+
+    .workout-title::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100px;
+        height: 4px;
+        background: var(--primary-gradient);
+        border-radius: 2px;
+        animation: underlineExpand 1s ease-out 0.5s both;
+    }
+
+    .workout-subtitle {
+        font-size: 1.3rem;
+        color: var(--text-secondary);
+        margin-bottom: 2rem;
+        opacity: 0;
+        animation: fadeInUp 1s ease-out 0.8s both;
+    }
+
+    @keyframes titleGlow {
+        0% { text-shadow: 0 0 20px rgba(102, 126, 234, 0.3); }
+        100% { text-shadow: 0 0 40px rgba(102, 126, 234, 0.6); }
+    }
+
+    @keyframes underlineExpand {
+        0% { width: 0; }
+        100% { width: 100px; }
+    }
+
+    @keyframes fadeInUp {
+        0% { opacity: 0; transform: translateY(30px); }
+        100% { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Exercise Cards */
+    .exercises-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 2rem;
+        margin-bottom: 3rem;
+    }
+
+    .exercise-card {
+        background: rgba(255, 255, 255, 0.03);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 2rem;
+        padding: 2rem;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        opacity: 0;
+        transform: translateY(50px);
+        animation: cardSlideIn 0.8s ease-out forwards;
+    }
+
+    .exercise-card:nth-child(1) { animation-delay: 0.2s; }
+    .exercise-card:nth-child(2) { animation-delay: 0.4s; }
+    .exercise-card:nth-child(3) { animation-delay: 0.6s; }
+
+    .exercise-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: var(--primary-gradient);
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.5s ease;
+    }
+
+    .exercise-card::after {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(102, 126, 234, 0.1) 0%, transparent 70%);
+        opacity: 0;
+        transition: opacity 0.5s ease;
+        pointer-events: none;
+    }
+
+    .exercise-card:hover {
+        transform: translateY(-15px) scale(1.02);
+        border-color: rgba(255, 255, 255, 0.2);
+        box-shadow: 
+            0 25px 50px rgba(0, 0, 0, 0.3),
+            0 0 50px rgba(102, 126, 234, 0.2);
+    }
+
+    .exercise-card:hover::before {
+        transform: scaleX(1);
+    }
+
+    .exercise-card:hover::after {
+        opacity: 1;
+    }
+
+    .exercise-icon {
+        width: 80px;
+        height: 80px;
+        background: var(--primary-gradient);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1.5rem;
+        font-size: 2rem;
+        color: white;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.4s ease;
+    }
+
+    .exercise-icon::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        transform: translate(-50%, -50%);
+        transition: all 0.4s ease;
+    }
+
+    .exercise-card:hover .exercise-icon {
+        transform: rotateY(360deg);
+    }
+
+    .exercise-card:hover .exercise-icon::before {
+        width: 100%;
+        height: 100%;
+    }
+
+    .exercise-name {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .exercise-card:hover .exercise-name {
+        color: var(--accent-primary);
+    }
+
+    .exercise-description {
+        color: var(--text-secondary);
+        line-height: 1.8;
+        font-size: 1.1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .exercise-image {
+        width: 100%;
+        max-width: 200px;
+        height: auto;
+        border-radius: 1rem;
+        margin: 1rem auto;
+        display: block;
+        transition: all 0.4s ease;
+        border: 2px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .exercise-card:hover .exercise-image {
+        transform: scale(1.05);
+        border-color: rgba(102, 126, 234, 0.5);
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+    }
+
+    @keyframes cardSlideIn {
+        0% {
+            opacity: 0;
+            transform: translateY(50px);
+        }
+        100% {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Rest Section */
+    .rest-section {
+        text-align: center;
+        margin: 4rem 0;
+        padding: 3rem 2rem;
+        background: rgba(255, 255, 255, 0.02);
+        backdrop-filter: blur(15px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .rest-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+        animation: shimmer 2s infinite;
+    }
+
+    .rest-icon {
+        font-size: 4rem;
+        color: var(--accent-warning);
+        margin-bottom: 1rem;
+        animation: pulse 2s infinite;
+    }
+
+    .rest-title {
+        font-size: 2.2rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 1rem;
+    }
+
+    .rest-description {
+        font-size: 1.2rem;
+        color: var(--text-secondary);
+    }
+
+    @keyframes shimmer {
+        0% { left: -100%; }
+        100% { left: 100%; }
+    }
+
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); opacity: 0.8; }
+        50% { transform: scale(1.1); opacity: 1; }
+    }
+
+    /* Start Button Section */
+    .start-section {
+        text-align: center;
+        margin-top: 4rem;
+        position: relative;
+    }
+
+    .start-prompt {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 2rem;
+        opacity: 0;
+        animation: fadeInUp 1s ease-out 1.5s both;
+    }
+
+    .start-button {
+        display: inline-block;
+        padding: 1.2rem 3rem;
+        background: var(--primary-gradient);
+        border: none;
+        border-radius: 2rem;
+        color: white;
+        font-size: 1.3rem;
+        font-weight: 700;
+        text-decoration: none;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 
+            0 10px 30px rgba(102, 126, 234, 0.4),
+            inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        opacity: 0;
+        transform: translateY(30px);
+        animation: buttonSlideIn 1s ease-out 1.8s both;
+    }
+
+    .start-button::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+        transition: left 0.5s;
+    }
+
+    .start-button::after {
+        content: '🚀';
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 1.2rem;
+        opacity: 0;
+        transition: all 0.3s ease;
+    }
+
+    .start-button:hover {
+        transform: translateY(-8px) scale(1.05);
+        box-shadow: 
+            0 20px 50px rgba(102, 126, 234, 0.6),
+            0 0 50px rgba(102, 126, 234, 0.4),
+            inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        color: white;
+        text-decoration: none;
+        padding-right: 4rem;
+    }
+
+    .start-button:hover::before {
+        left: 100%;
+    }
+
+    .start-button:hover::after {
+        opacity: 1;
+    }
+
+    @keyframes buttonSlideIn {
+        0% {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        100% {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .workout-title {
+            font-size: 2.5rem;
+        }
+
+        .exercises-grid {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        .exercise-card {
+            padding: 1.5rem;
+        }
+
+        .start-button {
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .workout-title {
+            font-size: 2rem;
+        }
+
+        .exercise-name {
+            font-size: 1.5rem;
+        }
+
+        .exercise-description {
+            font-size: 1rem;
+        }
+    }
 </style>
-</head>
-<body>
+{% endblock %}
 
-<div class="container">
-  <h1>{{today}}'s Workout Plan</h1>
-  
-  <h2>Warm-up</h2>
-  <div class="exercise">
-    <h3>Jumping Jacks</h3>
-    <img src="{% static 'exercises/jumping_jacks.gif' %}" alt="Jumping Jacks">
-    <p>Jumping jacks are a great warm-up exercise to get your heart pumping and your muscles warmed up.</p>
-  </div>
-  
-  <div class="exercise">
-    <h3>Arm Circles</h3>
-    <img src="{% static 'exercises/arm_circles.gif' %}" alt="Arm Circles">
-    <p>Arm circles help improve flexibility and range of motion in the shoulders, preparing them for more intense exercises.</p>
-  </div>
-  <div class="exercise">
-    <h3>Push-ups</h3>
-    <img src="{% static 'exercises/pushups.gif' %}" alt="Push-ups">
-    <p>Push-ups are a classic bodyweight exercise that strengthens the chest, shoulders, triceps, and core muscles.</p>
-  </div>
-
-  <h2>Rest</h2>
-  <div class="exercise">
-    <h3>Rest</h3>
-    <p>Take a 1-minute break before the next set of exercises.</p>
-  </div>
-  
-  <h3>Click on "Start" To StartMainExercises if You Have Done Warm-up!</h3>
-  <center><a href="/workout?pid={{user.id}}" style="text-decoration: none;">
-    <button class="button-64" role="button"><span class="text">Start Main Exercises</span></button>
-    </a></center>
-
+{% block content %}
+<div class="workout-background">
+    <div class="floating-particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
 </div>
 
-</body>
-</html>
+<div class="workout-container">
+    <div class="container">
+        <div class="workout-header" data-aos="fade-down">
+            <h1 class="workout-title">{{today}}'s Workout Plan</h1>
+            <p class="workout-subtitle">Transform your body with our expertly designed warm-up routine</p>
+        </div>
+
+        <div class="exercises-grid">
+            <div class="exercise-card" data-aos="fade-up" data-aos-delay="100">
+                <div class="exercise-icon">
+                    <i class="fas fa-running"></i>
+                </div>
+                <h3 class="exercise-name">Jumping Jacks</h3>
+                <img src="{% static 'exercises/jumping_jacks.gif' %}" alt="Jumping Jacks" class="exercise-image">
+                <p class="exercise-description">
+                    Jumping jacks are a phenomenal warm-up exercise that gets your heart pumping and your muscles warmed up. This dynamic movement activates multiple muscle groups while improving cardiovascular endurance and preparing your body for intense training.
+                </p>
+            </div>
+
+            <div class="exercise-card" data-aos="fade-up" data-aos-delay="200">
+                <div class="exercise-icon">
+                    <i class="fas fa-sync-alt"></i>
+                </div>
+                <h3 class="exercise-name">Arm Circles</h3>
+                <img src="{% static 'exercises/arm_circles.gif' %}" alt="Arm Circles" class="exercise-image">
+                <p class="exercise-description">
+                    Arm circles help improve flexibility and range of motion in the shoulders, preparing them for more intense exercises. This simple yet effective movement lubricates the shoulder joints and activates the stabilizing muscles.
+                </p>
+            </div>
+
+            <div class="exercise-card" data-aos="fade-up" data-aos-delay="300">
+                <div class="exercise-icon">
+                    <i class="fas fa-fist-raised"></i>
+                </div>
+                <h3 class="exercise-name">Push-ups</h3>
+                <img src="{% static 'exercises/pushups.gif' %}" alt="Push-ups" class="exercise-image">
+                <p class="exercise-description">
+                    Push-ups are a classic bodyweight exercise that strengthens the chest, shoulders, triceps, and core muscles. This fundamental movement builds upper body strength and stability while engaging your entire core.
+                </p>
+            </div>
+        </div>
+
+        <div class="rest-section" data-aos="zoom-in">
+            <div class="rest-icon">
+                <i class="fas fa-pause-circle"></i>
+            </div>
+            <h3 class="rest-title">Rest Period</h3>
+            <p class="rest-description">Take a well-deserved 1-minute break before transitioning to the main exercises. Use this time to hydrate and mentally prepare for the intense workout ahead.</p>
+        </div>
+
+        <div class="start-section" data-aos="fade-up">
+            <h3 class="start-prompt">Ready to take your workout to the next level?</h3>
+            <a href="/workout?pid={{user.id}}" class="start-button">
+                Start Main Exercises
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Enhanced animations and interactions
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add floating animation to exercise icons
+        const icons = document.querySelectorAll('.exercise-icon');
+        icons.forEach((icon, index) => {
+            icon.style.animationDelay = `${index * 0.2}s`;
+            icon.classList.add('float-animation');
+        });
+
+        // Add subtle parallax effect to background particles
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const particles = document.querySelectorAll('.particle');
+            
+            particles.forEach((particle, index) => {
+                const speed = 0.5 + (index * 0.1);
+                particle.style.transform = `translateY(${scrolled * speed}px)`;
+            });
+        });
+
+        // Add click ripple effect to exercise cards
+        const cards = document.querySelectorAll('.exercise-card');
+        cards.forEach(card => {
+            card.addEventListener('click', function(e) {
+                const ripple = document.createElement('div');
+                const rect = card.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                
+                ripple.style.width = ripple.style.height = size + 'px';
+                ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
+                ripple.style.top = (e.clientY - rect.top - size / 2) + 'px';
+                ripple.classList.add('ripple-effect');
+                
+                card.appendChild(ripple);
+                
+                setTimeout(() => {
+                    ripple.remove();
+                }, 600);
+            });
+        });
+
+        // Smooth hover effects for images
+        const images = document.querySelectorAll('.exercise-image');
+        images.forEach(img => {
+            img.addEventListener('mouseenter', function() {
+                this.style.filter = 'brightness(1.1) contrast(1.1)';
+            });
+            
+            img.addEventListener('mouseleave', function() {
+                this.style.filter = 'brightness(1) contrast(1)';
+            });
+        });
+    });
+
+    // Add CSS for additional animations
+    const style = document.createElement('style');
+    style.textContent = `
+        .float-animation {
+            animation: iconFloat 3s ease-in-out infinite;
+        }
+        
+        @keyframes iconFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .ripple-effect {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(102, 126, 234, 0.3);
+            transform: scale(0);
+            animation: ripple 0.6s linear;
+            pointer-events: none;
+        }
+        
+        @keyframes ripple {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+    `;
+    document.head.appendChild(style);
+</script>
+{% endblock %}

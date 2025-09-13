@@ -1,23 +1,1178 @@
+{% extends "parent.html" %}
 {% load static %}
 
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Your Diet Plan</title>
-  <link rel="stylesheet" href="{% static 'css/styles_of_dietplan.css' %}">
-</head>
-<body>
-  <div class="container">
-    <div class="image-container">
-      <img id="mainImage" src="{% static 'images/dietplan.png' %}" alt="Main Image">
+{% block title %}7-Day Healthy Weight-Gain Meal Plan - FitnessPro{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Diet Plan Specific Styles */
+    .diet-plan-section {
+        padding: 6rem 0 4rem;
+        background: var(--bg-primary);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .diet-plan-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: 
+            radial-gradient(circle at 30% 40%, rgba(102, 126, 234, 0.1) 0%, transparent 50%),
+            radial-gradient(circle at 70% 80%, rgba(118, 75, 162, 0.1) 0%, transparent 50%);
+        pointer-events: none;
+    }
+
+    .diet-plan-header {
+        text-align: center;
+        margin-bottom: 4rem;
+        position: relative;
+        z-index: 2;
+    }
+
+    .diet-plan-title {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 2.5rem;
+        font-weight: 700;
+        background: var(--primary-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .diet-plan-subtitle {
+        font-size: 1.2rem;
+        color: var(--text-secondary);
+        font-weight: 500;
+        margin-bottom: 2rem;
+    }
+
+    .calorie-info {
+        display: inline-block;
+        background: var(--bg-card);
+        backdrop-filter: var(--blur-md);
+        border: 1px solid var(--border-color);
+        border-radius: 2rem;
+        padding: 1rem 2rem;
+        font-weight: 600;
+        color: var(--accent-primary);
+        font-size: 1.1rem;
+    }
+
+    .meal-plan-container {
+        position: relative;
+        z-index: 2;
+        margin: 0 auto;
+        max-width: 1200px;
+    }
+
+    .meal-plan-card {
+        background: var(--bg-card);
+        backdrop-filter: var(--blur-md);
+        border: 1px solid var(--border-color);
+        border-radius: 2rem;
+        padding: 3rem;
+        box-shadow: var(--shadow-lg);
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 2rem;
+    }
+
+    .meal-plan-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--primary-gradient);
+    }
+
+    .meal-headers {
+        display: grid;
+        grid-template-columns: 80px repeat(5, 1fr);
+        gap: 1rem;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid var(--border-color);
+    }
+
+    .meal-header {
+        text-align: center;
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: var(--text-primary);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .meal-header.day-header {
+        color: var(--accent-primary);
+    }
+
+    .meal-subheader {
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+        font-weight: 500;
+        margin-top: 0.5rem;
+        text-transform: none;
+        letter-spacing: 0;
+    }
+
+    .day-row {
+        display: grid;
+        grid-template-columns: 80px repeat(5, 1fr);
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        padding: 1.5rem;
+        background: var(--bg-secondary);
+        border-radius: 1.5rem;
+        border: 1px solid var(--border-color);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+    }
+
+    .day-row:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-md);
+        border-color: var(--border-hover);
+    }
+
+    .day-number {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 700;
+        font-size: 1.2rem;
+        color: var(--text-primary);
+        background: var(--primary-gradient);
+        border-radius: 1rem;
+        height: fit-content;
+        padding: 0.75rem;
+        text-align: center;
+        color: white;
+        min-height: 50px;
+    }
+
+    .meal-item {
+        background: var(--bg-tertiary);
+        border: 1px solid var(--border-color);
+        border-radius: 1rem;
+        padding: 1rem;
+        transition: all 0.3s ease;
+        position: relative;
+        min-height: 120px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .meal-item:hover {
+        background: var(--bg-card);
+        border-color: var(--border-hover);
+    }
+
+    .meal-content {
+        font-size: 0.9rem;
+        line-height: 1.4;
+        color: var(--text-secondary);
+        font-weight: 500;
+    }
+
+    .meal-content strong {
+        color: var(--text-primary);
+        display: block;
+        margin-bottom: 0.25rem;
+        font-size: 0.95rem;
+    }
+
+    .controls-section {
+        text-align: center;
+        margin-top: 3rem;
+        position: relative;
+        z-index: 2;
+    }
+
+    .control-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-bottom: 2rem;
+    }
+
+    .control-btn {
+        padding: 0.875rem 2rem;
+        border: none;
+        border-radius: 1.5rem;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .control-btn.primary {
+        background: var(--primary-gradient);
+        color: white;
+    }
+
+    .control-btn.secondary {
+        background: transparent;
+        color: var(--text-primary);
+        border: 2px solid var(--border-color);
+    }
+
+    .control-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-glow);
+    }
+
+    .control-btn.primary:hover {
+        filter: brightness(1.1);
+    }
+
+    .control-btn.secondary:hover {
+        background: var(--bg-card);
+        border-color: var(--accent-primary);
+    }
+
+    .download-btn {
+        background: var(--secondary-gradient);
+        color: white;
+        padding: 1rem 3rem;
+        border: none;
+        border-radius: 2rem;
+        font-weight: 700;
+        font-size: 1.1rem;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .download-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        transition: left 0.5s;
+    }
+
+    .download-btn:hover::before {
+        left: 100%;
+    }
+
+    .download-btn:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-lg);
+        filter: brightness(1.1);
+    }
+
+    .nutrition-summary {
+        background: var(--bg-card);
+        backdrop-filter: var(--blur-md);
+        border: 1px solid var(--border-color);
+        border-radius: 1.5rem;
+        padding: 2rem;
+        margin-top: 2rem;
+        text-align: left;
+    }
+
+    .nutrition-title {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 1rem;
+    }
+
+    .nutrition-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+
+    .nutrition-item {
+        text-align: center;
+        padding: 1rem;
+        background: var(--bg-secondary);
+        border-radius: 1rem;
+        border: 1px solid var(--border-color);
+    }
+
+    .nutrition-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--accent-primary);
+        display: block;
+    }
+
+    .nutrition-label {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-top: 0.5rem;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+        .meal-headers,
+        .day-row {
+            grid-template-columns: 60px repeat(5, 1fr);
+            gap: 0.75rem;
+        }
+
+        .meal-plan-card {
+            padding: 2rem;
+        }
+
+        .meal-item {
+            min-height: 100px;
+            padding: 0.75rem;
+        }
+
+        .meal-content {
+            font-size: 0.85rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .diet-plan-title {
+            font-size: 2rem;
+        }
+
+        .meal-plan-card {
+            padding: 1.5rem;
+        }
+
+        .meal-headers,
+        .day-row {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .day-number {
+            order: -1;
+            margin-bottom: 1rem;
+        }
+
+        .meal-item {
+            min-height: 80px;
+        }
+
+        .control-buttons {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .control-btn {
+            width: 200px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .diet-plan-section {
+            padding: 5rem 0 2rem;
+        }
+
+        .diet-plan-title {
+            font-size: 1.75rem;
+        }
+
+        .meal-plan-card {
+            padding: 1rem;
+            border-radius: 1.5rem;
+        }
+
+        .nutrition-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* Print styles */
+    @media print {
+        .controls-section {
+            display: none;
+        }
+
+        .meal-plan-card {
+            box-shadow: none;
+            border: 2px solid #000;
+        }
+
+        .day-row {
+            break-inside: avoid;
+        }
+    }
+
+    /* Animation classes */
+    .fade-in {
+        opacity: 0;
+        animation: fadeIn 0.5s ease-in-out forwards;
+    }
+
+    @keyframes fadeIn {
+        to {
+            opacity: 1;
+        }
+    }
+
+    .slide-up {
+        transform: translateY(30px);
+        opacity: 0;
+        animation: slideUp 0.6s ease-out forwards;
+    }
+
+    @keyframes slideUp {
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="diet-plan-section" data-aos="fade-up">
+    <div class="container">
+        <div class="diet-plan-header">
+            <h1 class="diet-plan-title" data-aos="fade-down">7-Day Healthy Weight-Gain Meal Plan</h1>
+            <p class="diet-plan-subtitle" data-aos="fade-up" data-aos-delay="100">
+                Complete nutrition guide for healthy weight gain
+            </p>
+            <div class="calorie-info" data-aos="zoom-in" data-aos-delay="200">
+                2,500 Calories Daily
+            </div>
+        </div>
+
+        <div class="meal-plan-container">
+            <div class="meal-plan-card" data-aos="fade-up" data-aos-delay="300">
+                <div class="meal-headers">
+                    <div class="meal-header day-header">Day</div>
+                    <div class="meal-header">
+                        Breakfast
+                        <div class="meal-subheader">Aim for 250 - 300 cals</div>
+                    </div>
+                    <div class="meal-header">
+                        A.M. Snack
+                        <div class="meal-subheader">Aim to fulfill calories</div>
+                    </div>
+                    <div class="meal-header">
+                        Lunch
+                        <div class="meal-subheader">Aim for 500-550 cals</div>
+                    </div>
+                    <div class="meal-header">
+                        P.M. Snack
+                        <div class="meal-subheader">Aim to fulfill calories</div>
+                    </div>
+                    <div class="meal-header">
+                        Dinner
+                        <div class="meal-subheader">Aim for 400 - 500 cals</div>
+                    </div>
+                </div>
+
+                <!-- Day 1 -->
+                <div class="day-row fade-in" style="animation-delay: 0.1s">
+                    <div class="day-number">1</div>
+                    <div class="meal-item">
+                        <div class="meal-content">
+                            <strong>1 serving Vegan Freezer Break-fast Burrito</strong>
+                            1 small orange
+                        </div>
+                    </div>
+                    <div class="meal-item">
+                        <div class="meal-content">
+                            <strong>1 serving Almond-Honey Power Bars</strong>
+                        </div>
+                    </div>
+                    <div class="meal-item">
+                        <div class="meal-content">
+                            <strong>2 servings Vegetable & Tuna Pasta Salad</strong>
+                            1 cup unsalted peanut butter
+                        </div>
+                    </div>
+                    <div class="meal-item">
+                        <div class="meal-content">
+                            <strong>1 large apple and 1 Tbsp. natural peanut butter</strong>
+                        </div>
+                    </div>
+                    <div class="meal-item">
+                        <div class="meal-content">
+                            <strong>1 serving Sheet-Pan Maple-Mustard Pork Chops and Carrots & 1 serving Sweet Potato Fries</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Day 2 -->
+                <div class="day-row fade-in" style="animation-delay: 0.2s">
+                    <div class="day-number">2</div>
+                    <div class="meal-item">
+                        <div class="meal-content">
+                            <strong>1 serving Raspberry-Peach Mango Smoothie Bowl and 1 hard-boiled egg</strong>
+                        </div>
+                    </div>
+                    <div class="meal-item">
+                        <div class="meal-content">
+                            <strong>15 baby carrots, 3 Tbsp. hummus, and 1 medium banana</strong>
+                        </div>
+                    </div>
+                    <div class="meal-item">
+                        <div class="meal-content">
+                            <strong>1 serving Roasted Butternut Squash & Root Vegetables with Cauliflower Gnocchi and 1 slice whole-wheat toast with 1 Tbsp. salted butter</strong>
+                        </div>
+                    </div>
+                    <div class="meal-item">
+                        <div class="meal-content">
+                            <strong>1 serving Homemade Microwave Popcorn, 1 large banana, and 6 unsalted almonds</strong>
+                        </div>
+                    </div>
+                    <div class="meal-item">
+                        <div class="meal-content">
+                            <strong>2 servings Philly Cheese Steak Sloppy Joes</strong>
+                            2 cups fresh spinach, ¼ cup shredded carrots topped with 2 Tbsp. vinaigrette and 1 Tbsp. balsamic vinegar
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Day 3 -->
+                <div class="day-row fade-in" style="animation-delay: 0.3s">
+                    <div class="day-number">3</div>
+                    <div class="meal-item">
+                        <div class="meal-content">
+                            <strong>2 servings Maple-Nut Granola and 1 cup 2% milk</strong>
+                        </div>
+                    </div>
+                    <div class="meal-item">
+                        <div class="meal-content">
+                            <strong>1 slice Swiss cheese and a whole-wheat crackers</strong>
+                        </div>
+                    </div>
+                    <div class="meal-item">
+                        <div class="meal-content">
+                            <strong>1 serving Roasted Butternut Squash & Root Vegetables with Cauliflower Gnocchi and 1 slice whole-wheat toast with 1 tsp. unsalted butter</strong>
+                        </div>
+                    </div>
+                    <div class="meal-item">
+                        <div class="meal-content">
+                            <strong>6 oz. 2% plain Greek yogurt, 1 cup strawberries, and 1 Tbsp. honey</strong>
+                        </div>
+                    </div>
+                    <div class="meal-item">
+                        <div class="meal-content">
+                            <strong>2 servings Creamy Chicken, Brussels Sprouts and Mushroom One-Pot Pasta</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Day 4 -->
+                <div class="day-row fade-in" style="animation-delay: 0.4s">
+                    <div class="day-number">4</div>
+                    <div class="meal-item">
+                        <div class="meal-content">
+                            <strong>2 servings Maple-Nut Granola and 1 cup 2% milk orange</strong>
+                        </div>
+                    </div>
+                    <div class="meal-item">
+                        <div class="meal-content">
+                            <strong>15 carrot sticks, ¼ cup hummus, and 1 medium apple</strong>
+                        </div>
+                    </div>
+                    <div class="meal-item">
+                        <div class="meal-content">
+                            <strong>1 serving Roasted Butternut Squash & Root Vegetables with Cauliflower Gnocchi and 1 slice whole-wheat toast with 1 tsp. unsalted butter</strong>
+                        </div>
+                    </div>
+                    <div class="meal-item">
+                        <div class="meal-content">
+                            <strong>4 graham crackers and 1 medium apple</strong>
+                        </div>
+                    </div>
+                    <div class="meal-item">
+                        <div class="meal-content">
+                            <strong>1 serving One-Pot Garlicky Shrimp & Broccoli with en Fried Chicken, 1 serving Greek Potato Salad, and 1 serving Garlicky Green Beans</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Day 5 -->
+                <div class="day-row fade-in" style="animation-delay: 0.5s">
+                    <div class="day-number">5</div>
+                    <div class="meal-item">
+                        <div class="meal-content">
+                            <strong>1 serving Raspberry-Peach Mango Smoothie Bowl and 2 hard-boiled eggs</strong>
+                        </div>
+                    </div>
+                    <div class="meal-item">
+                        <div class="meal-content">
+                            <strong>2 servings Almond-Honey Power Bars</strong>
+                        </div>
+                    </div>
+                    <div class="meal-item">
+                        <div class="meal-content">
+                            <strong>1 serving Roasted Butternut Squash & Root Vegetables with Cauliflower Gnocchi and 1 slice whole-wheat toast with 1 tsp. unsalted butter</strong>
+                        </div>
+                    </div>
+                    <div class="meal-item">
+                        <div class="meal-content">
+                            <strong>2 servings Homemade Microwave Popcorn</strong>
+                        </div>
+                    </div>
+                    <div class="meal-item">
+                        <div class="meal-content">
+                            <strong>2 servings Green Goddess Salad with Chickpeas and 1 serving Garlic-Herb Roasted Salmon with 1 tsp. unsalted butter</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Day 6 -->
+                <div class="day-row fade-in" style="animation-delay: 0.6s">
+                    <div class="day-number">6</div>
+                    <div class="meal-item">
+                        <div class="meal-content">
+                            <strong>1 serving Raspberry-Peach Mango Smoothie Bowl, 1 medium orange, and 2 hard-boiled eggs</strong>
+                        </div>
+                    </div>
+                    <div class="meal-item">
+                        <div class="meal-content">
+                            <strong>1 medium apple and 1 Tbsp. peanut butter</strong>
+                        </div>
+                    </div>
+                    <div class="meal-item">
+                        <div class="meal-content">
+                            <strong>2 servings Creamy Avocado and White Bean Wraps and 1 cup strawberries</strong>
+                        </div>
+                    </div>
+                    <div class="meal-item">
+                        <div class="meal-content">
+                            <strong>4 graham crackers</strong>
+                        </div>
+                    </div>
+                    <div class="meal-item">
+                        <div class="meal-content">
+                            <strong>2 servings Tortilla Chip Flounder with Black Bean Salsa</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Day 7 -->
+                <div class="day-row fade-in" style="animation-delay: 0.7s">
+                    <div class="day-number">7</div>
+                    <div class="meal-item">
+                        <div class="meal-content">
+                            <strong>1 serving Peanut Butter Burst, 1 medium banana, and 2 Tbsp. peanut butter</strong>
+                        </div>
+                    </div>
+                    <div class="meal-item">
+                        <div class="meal-content">
+                            <strong>6 oz. 2% plain Greek yogurt, ½ cup blueberries, and 1 Tbsp. honey</strong>
+                        </div>
+                    </div>
+                    <div class="meal-item">
+                        <div class="meal-content">
+                            <strong>2 servings Creamy Avocado and White Bean Wraps</strong>
+                        </div>
+                    </div>
+                    <div class="meal-item">
+                        <div class="meal-content">
+                            <strong>1 serving Almond-Honey Power Bar</strong>
+                        </div>
+                    </div>
+                    <div class="meal-item">
+                        <div class="meal-content">
+                            <strong>1 serving Creamed Spinach-Stuffed Salmon, 2 servings Garlicky Green Beans, and ¾ cup Easy Brown Rice</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="nutrition-summary" data-aos="fade-up" data-aos-delay="600">
+                <h3 class="nutrition-title">Daily Nutrition Summary</h3>
+                <div class="nutrition-grid">
+                    <div class="nutrition-item">
+                        <span class="nutrition-value">2,500</span>
+                        <span class="nutrition-label">Calories</span>
+                    </div>
+                    <div class="nutrition-item">
+                        <span class="nutrition-value">125g</span>
+                        <span class="nutrition-label">Protein</span>
+                    </div>
+                    <div class="nutrition-item">
+                        <span class="nutrition-value">300g</span>
+                        <span class="nutrition-label">Carbs</span>
+                    </div>
+                    <div class="nutrition-item">
+                        <span class="nutrition-value">100g</span>
+                        <span class="nutrition-label">Healthy Fats</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls-section" data-aos="fade-up" data-aos-delay="700">
+            <div class="control-buttons">
+                <button class="control-btn secondary" id="printPlan">
+                    <i class="fas fa-print me-2"></i>Print Plan
+                </button>
+                <button class="control-btn secondary" id="sharePlan">
+                    <i class="fas fa-share-alt me-2"></i>Share Plan
+                </button>
+                <button class="control-btn secondary" id="customizePlan">
+                    <i class="fas fa-edit me-2"></i>Customize Plan
+                </button>
+            </div>
+            
+            <a href="#" class="download-btn" id="downloadPlan">
+                <i class="fas fa-download"></i>
+                Download Complete Diet Plan
+            </a>
+        </div>
     </div>
-    <div class="controls">
-      <button id="zoomIn">Zoom In</button>
-      <button id="zoomOut">Zoom Out</button>
-      <a id="downloadLink" download="dietplan.png" href="#">Download</a>
-    </div>
-  </div>
-  <script src="{% static 'js/script_of_dietplan.js' %}"></script>
-</body>
-</html>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Animate day rows on scroll
+        const dayRows = document.querySelectorAll('.day-row');
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animationPlayState = 'running';
+                }
+            });
+        }, observerOptions);
+
+        dayRows.forEach(row => {
+            observer.observe(row);
+        });
+
+        // Print functionality
+        document.getElementById('printPlan').addEventListener('click', function() {
+            window.print();
+        });
+
+        // Share functionality
+        document.getElementById('sharePlan').addEventListener('click', function() {
+            if (navigator.share) {
+                navigator.share({
+                    title: '7-Day Healthy Weight-Gain Meal Plan',
+                    text: 'Check out this comprehensive 2,500 calorie meal plan for healthy weight gain!',
+                    url: window.location.href
+                }).catch(console.error);
+            } else {
+                // Fallback to copying URL to clipboard
+                navigator.clipboard.writeText(window.location.href).then(function() {
+                    showNotification('Link copied to clipboard!', 'success');
+                }).catch(function() {
+                    showNotification('Unable to share. Please copy the URL manually.', 'error');
+                });
+            }
+        });
+
+        // Customize plan functionality
+        document.getElementById('customizePlan').addEventListener('click', function() {
+            showNotification('Customization feature coming soon!', 'info');
+        });
+
+        // Download functionality
+        document.getElementById('downloadPlan').addEventListener('click', function(e) {
+            e.preventDefault();
+            generatePDFDownload();
+        });
+
+        // Generate PDF download
+        function generatePDFDownload() {
+            const element = document.querySelector('.meal-plan-card');
+            const downloadBtn = document.getElementById('downloadPlan');
+            
+            // Show loading state
+            const originalText = downloadBtn.innerHTML;
+            downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Generating PDF...';
+            downloadBtn.style.pointerEvents = 'none';
+
+            // Create a printable version
+            const printWindow = window.open('', '_blank');
+            const printContent = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>7-Day Healthy Weight-Gain Meal Plan - FitnessPro</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; margin: 20px; background: white; color: black; }
+                        .calorie-info { background: #f0f0f0; padding: 10px; border-radius: 5px; margin-bottom: 20px; }
+                        .meal-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+                        .meal-table th, .meal-table td { border: 1px solid #333; padding: 10px; text-align: left; }
+                        .meal-table th { background: #f5f5f5; font-weight: bold; }
+                        .day-cell { font-weight: bold; text-align: center; background: #e0e0e0; }
+                        .nutrition-summary { margin-top: 30px; padding: 20px; border: 2px solid #333; }
+                        .nutrition-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-top: 15px; }
+                        .nutrition-item { text-align: center; padding: 10px; border: 1px solid #ccc; }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <div class="title">7-DAY HEALTHY WEIGHT-GAIN MEAL PLAN</div>
+                        <div class="subtitle">2,500 CALORIES DAILY</div>
+                        <div class="calorie-info">Complete nutrition guide for healthy weight gain - FitnessPro</div>
+                    </div>
+                    
+                    <table class="meal-table">
+                        <thead>
+                            <tr>
+                                <th>Day</th>
+                                <th>Breakfast<br><small>Aim for 250-300 cals</small></th>
+                                <th>A.M. Snack<br><small>Aim to fulfill calories</small></th>
+                                <th>Lunch<br><small>Aim for 500-550 cals</small></th>
+                                <th>P.M. Snack<br><small>Aim to fulfill calories</small></th>
+                                <th>Dinner<br><small>Aim for 400-500 cals</small></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="day-cell">1</td>
+                                <td>1 serving Vegan Freezer Breakfast Burrito<br>1 small orange</td>
+                                <td>1 serving Almond-Honey Power Bars</td>
+                                <td>2 servings Vegetable & Tuna Pasta Salad<br>1 cup unsalted peanut butter</td>
+                                <td>1 large apple and 1 Tbsp. natural peanut butter</td>
+                                <td>1 serving Sheet-Pan Maple-Mustard Pork Chops and Carrots & 1 serving Sweet Potato Fries</td>
+                            </tr>
+                            <tr>
+                                <td class="day-cell">2</td>
+                                <td>1 serving Raspberry-Peach Mango Smoothie Bowl and 1 hard-boiled egg</td>
+                                <td>15 baby carrots, 3 Tbsp. hummus, and 1 medium banana</td>
+                                <td>1 serving Roasted Butternut Squash & Root Vegetables with Cauliflower Gnocchi and 1 slice whole-wheat toast with 1 Tbsp. salted butter</td>
+                                <td>1 serving Homemade Microwave Popcorn, 1 large banana, and 6 unsalted almonds</td>
+                                <td>2 servings Philly Cheese Steak Sloppy Joes<br>2 cups fresh spinach, ¼ cup shredded carrots topped with 2 Tbsp. vinaigrette and 1 Tbsp. balsamic vinegar</td>
+                            </tr>
+                            <tr>
+                                <td class="day-cell">3</td>
+                                <td>2 servings Maple-Nut Granola and 1 cup 2% milk</td>
+                                <td>1 slice Swiss cheese and whole-wheat crackers</td>
+                                <td>1 serving Roasted Butternut Squash & Root Vegetables with Cauliflower Gnocchi and 1 slice whole-wheat toast with 1 tsp. unsalted butter</td>
+                                <td>6 oz. 2% plain Greek yogurt, 1 cup strawberries, and 1 Tbsp. honey</td>
+                                <td>2 servings Creamy Chicken, Brussels Sprouts and Mushroom One-Pot Pasta</td>
+                            </tr>
+                            <tr>
+                                <td class="day-cell">4</td>
+                                <td>2 servings Maple-Nut Granola and 1 cup 2% milk orange</td>
+                                <td>15 carrot sticks, ¼ cup hummus, and 1 medium apple</td>
+                                <td>1 serving Roasted Butternut Squash & Root Vegetables with Cauliflower Gnocchi and 1 slice whole-wheat toast with 1 tsp. unsalted butter</td>
+                                <td>4 graham crackers and 1 medium apple</td>
+                                <td>1 serving One-Pot Garlicky Shrimp & Broccoli with Fried Chicken, 1 serving Greek Potato Salad, and 1 serving Garlicky Green Beans</td>
+                            </tr>
+                            <tr>
+                                <td class="day-cell">5</td>
+                                <td>1 serving Raspberry-Peach Mango Smoothie Bowl and 2 hard-boiled eggs</td>
+                                <td>2 servings Almond-Honey Power Bars</td>
+                                <td>1 serving Roasted Butternut Squash & Root Vegetables with Cauliflower Gnocchi and 1 slice whole-wheat toast with 1 tsp. unsalted butter</td>
+                                <td>2 servings Homemade Microwave Popcorn</td>
+                                <td>2 servings Green Goddess Salad with Chickpeas and 1 serving Garlic-Herb Roasted Salmon with 1 tsp. unsalted butter</td>
+                            </tr>
+                            <tr>
+                                <td class="day-cell">6</td>
+                                <td>1 serving Raspberry-Peach Mango Smoothie Bowl, 1 medium orange, and 2 hard-boiled eggs</td>
+                                <td>1 medium apple and 1 Tbsp. peanut butter</td>
+                                <td>2 servings Creamy Avocado and White Bean Wraps and 1 cup strawberries</td>
+                                <td>4 graham crackers</td>
+                                <td>2 servings Tortilla Chip Flounder with Black Bean Salsa</td>
+                            </tr>
+                            <tr>
+                                <td class="day-cell">7</td>
+                                <td>1 serving Peanut Butter Burst, 1 medium banana, and 2 Tbsp. peanut butter</td>
+                                <td>6 oz. 2% plain Greek yogurt, ½ cup blueberries, and 1 Tbsp. honey</td>
+                                <td>2 servings Creamy Avocado and White Bean Wraps</td>
+                                <td>1 serving Almond-Honey Power Bar</td>
+                                <td>1 serving Creamed Spinach-Stuffed Salmon, 2 servings Garlicky Green Beans, and ¾ cup Easy Brown Rice</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <div class="nutrition-summary">
+                        <h3>Daily Nutrition Summary</h3>
+                        <div class="nutrition-grid">
+                            <div class="nutrition-item">
+                                <strong>2,500</strong><br>Calories
+                            </div>
+                            <div class="nutrition-item">
+                                <strong>125g</strong><br>Protein
+                            </div>
+                            <div class="nutrition-item">
+                                <strong>300g</strong><br>Carbs
+                            </div>
+                            <div class="nutrition-item">
+                                <strong>100g</strong><br>Healthy Fats
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 30px; text-align: center; font-size: 12px; color: #666;">
+                        Generated by FitnessPro - Your Complete Fitness Solution<br>
+                        For more personalized meal plans, visit us at FitnessPro.com
+                    </div>
+                </body>
+                </html>
+            `;
+
+            printWindow.document.write(printContent);
+            printWindow.document.close();
+
+            // Reset button after a delay
+            setTimeout(() => {
+                downloadBtn.innerHTML = originalText;
+                downloadBtn.style.pointerEvents = 'auto';
+                
+                // Trigger print dialog
+                printWindow.print();
+                
+                showNotification('PDF ready for download!', 'success');
+            }, 1500);
+        }
+
+        // Notification system
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'success' ? '#2ed573' : type === 'error' ? '#ff4757' : '#667eea'};
+                color: white;
+                padding: 1rem 1.5rem;
+                border-radius: 10px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                z-index: 9999;
+                font-weight: 600;
+                opacity: 0;
+                transform: translateX(100px);
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            `;
+            
+            notification.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check' : type === 'error' ? 'times' : 'info'}-circle me-2"></i>
+                ${message}
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Animate in
+            requestAnimationFrame(() => {
+                notification.style.opacity = '1';
+                notification.style.transform = 'translateX(0)';
+            });
+            
+            // Remove after 4 seconds
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                notification.style.transform = 'translateX(100px)';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 4000);
+        }
+
+        // Meal item hover effects
+        document.querySelectorAll('.meal-item').forEach(item => {
+            item.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.02)';
+                this.style.zIndex = '10';
+            });
+            
+            item.addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(1)';
+                this.style.zIndex = '1';
+            });
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey || e.metaKey) {
+                switch(e.key) {
+                    case 'p':
+                        e.preventDefault();
+                        document.getElementById('printPlan').click();
+                        break;
+                    case 's':
+                        e.preventDefault();
+                        document.getElementById('downloadPlan').click();
+                        break;
+                }
+            }
+        });
+
+        // Smooth scroll to sections
+        const dayNumbers = document.querySelectorAll('.day-number');
+        dayNumbers.forEach(dayNumber => {
+            dayNumber.addEventListener('click', function() {
+                this.parentElement.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'center' 
+                });
+            });
+        });
+
+        // Add loading skeleton for better UX
+        function addLoadingSkeleton() {
+            const container = document.querySelector('.meal-plan-container');
+            container.classList.add('loading');
+            
+            setTimeout(() => {
+                container.classList.remove('loading');
+            }, 1000);
+        }
+
+        // Performance optimization - lazy load day rows
+        const dayRowsObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        dayRows.forEach(row => {
+            dayRowsObserver.observe(row);
+        });
+
+        // Add copy functionality for individual meals
+        document.querySelectorAll('.meal-content').forEach(meal => {
+            meal.addEventListener('click', function() {
+                const text = this.textContent;
+                navigator.clipboard.writeText(text).then(() => {
+                    showNotification('Meal copied to clipboard!', 'success');
+                }).catch(() => {
+                    showNotification('Unable to copy meal', 'error');
+                });
+            });
+        });
+
+        // Initialize tooltips for better UX
+        const tooltips = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+        tooltips.forEach(tooltip => {
+            new bootstrap.Tooltip(tooltip);
+        });
+
+        // Add search functionality
+        function addSearchFunctionality() {
+            const searchInput = document.createElement('input');
+            searchInput.type = 'text';
+            searchInput.placeholder = 'Search meals...';
+            searchInput.className = 'form-control';
+            searchInput.style.cssText = `
+                max-width: 300px;
+                margin: 0 auto 2rem;
+                display: block;
+            `;
+            
+            const header = document.querySelector('.diet-plan-header');
+            header.appendChild(searchInput);
+            
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                const dayRows = document.querySelectorAll('.day-row');
+                
+                dayRows.forEach(row => {
+                    const mealContent = row.textContent.toLowerCase();
+                    if (mealContent.includes(searchTerm)) {
+                        row.style.display = 'grid';
+                        row.style.opacity = '1';
+                    } else {
+                        row.style.opacity = searchTerm ? '0.3' : '1';
+                    }
+                });
+            });
+        }
+
+        // Initialize search if needed
+        // addSearchFunctionality();
+        
+        // Add meal favorites functionality
+        function initializeFavorites() {
+            const favoriteButtons = document.querySelectorAll('.meal-item');
+            
+            favoriteButtons.forEach((button, index) => {
+                const favoriteIcon = document.createElement('i');
+                favoriteIcon.className = 'fas fa-heart favorite-icon';
+                favoriteIcon.style.cssText = `
+                    position: absolute;
+                    top: 10px;
+                    right: 10px;
+                    color: #ccc;
+                    cursor: pointer;
+                    transition: color 0.3s ease;
+                `;
+                
+                button.style.position = 'relative';
+                button.appendChild(favoriteIcon);
+                
+                favoriteIcon.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    this.classList.toggle('favorited');
+                    this.style.color = this.classList.contains('favorited') ? '#ff4757' : '#ccc';
+                    
+                    const message = this.classList.contains('favorited') ? 
+                        'Added to favorites!' : 'Removed from favorites!';
+                    showNotification(message, 'success');
+                });
+            });
+        }
+
+        // Initialize favorites
+        initializeFavorites();
+        
+        // Progress tracking
+        let viewedDays = new Set();
+        
+        const trackProgress = () => {
+            dayRows.forEach((row, index) => {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            viewedDays.add(index + 1);
+                            updateProgressIndicator();
+                        }
+                    });
+                }, { threshold: 0.5 });
+                
+                observer.observe(row);
+            });
+        };
+        
+        const updateProgressIndicator = () => {
+            const progress = (viewedDays.size / 7) * 100;
+            // You can add a progress bar here if needed
+            console.log(`Progress: ${Math.round(progress)}% completed`);
+        };
+        
+        trackProgress();
+    });
+</script>
+{% endblock %}

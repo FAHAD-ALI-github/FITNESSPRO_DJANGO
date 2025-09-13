@@ -464,9 +464,9 @@
 {% endblock %}
 
 {% block content %}
+
 <section class="contact-page">
     <div class="container">
-        <!-- Contact Hero Section -->
         <div class="contact-hero" data-aos="fade-up">
             <span class="contact-badge">Get In Touch</span>
             <h1 class="contact-title">Contact FitnessPro</h1>
@@ -497,7 +497,7 @@
                 <!-- Form Messages -->
                 <div id="form-message" class="form-message"></div>
 
-                <form id="contact-form" method="POST" action="">
+                <form id="contact-form" method="POST" action="https://formspree.io/f/myzdvnzn">
                     {% csrf_token %}
                     <div class="form-group">
                         <label class="form-label" for="name">Full Name *</label>
@@ -536,6 +536,7 @@
                 </form>
             </div>
         </div>
+
 
         <!-- Contact Information Cards -->
         <div class="contact-info-section">
@@ -757,6 +758,41 @@ document.addEventListener('DOMContentLoaded', function() {
         this.style.height = 'auto';
         this.style.height = Math.min(this.scrollHeight, 200) + 'px';
     });
+});
+document.getElementById("contact-form").addEventListener("submit", async function(e) {
+    e.preventDefault();
+
+    const form = e.target;
+    const formData = new FormData(form);
+    const messageBox = document.getElementById("form-message");
+
+    messageBox.textContent = "Sending...";
+    messageBox.style.color = "#555";
+
+    try {
+        const response = await fetch(form.action, {
+            method: form.method,
+            body: formData,
+            headers: { 'Accept': 'application/json' }
+        });
+
+        if (response.ok) {
+            messageBox.textContent = "✅ Your message has been sent successfully!";
+            messageBox.style.color = "green";
+            form.reset();
+        } else {
+            const data = await response.json();
+            if (data.errors) {
+                messageBox.textContent = "❌ " + data.errors.map(err => err.message).join(", ");
+            } else {
+                messageBox.textContent = "❌ Oops! Something went wrong. Please try again.";
+            }
+            messageBox.style.color = "red";
+        }
+    } catch (error) {
+        messageBox.textContent = "⚠️ Network error. Please check your connection.";
+        messageBox.style.color = "red";
+    }
 });
 </script>
 {% endblock %}

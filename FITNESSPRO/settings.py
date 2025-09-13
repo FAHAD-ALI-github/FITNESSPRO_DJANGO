@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-186xzg1_rr0i5uez_c*inzu49ewxd23*-gx$n$p5e35mp%b=tn
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # Set to False when deploying to production
-DEBUG = False
+DEBUG = True
 
 # Add your PythonAnywhere domain to allowed hosts
 ALLOWED_HOSTS = ['yourusername.pythonanywhere.com', 'localhost', '127.0.0.1']
