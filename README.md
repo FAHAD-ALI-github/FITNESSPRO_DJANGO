@@ -9,25 +9,28 @@
 
 ### 👤 User Panel
 - 🔐 User login & signup
-- 📅 View today’s exercise
-- 🥗 View diet plan
+- 📅 View today’s planned exercise
+- 🥗 View professional's recommended diet plan
 - 🗑️ Delete profile
 - 🔒 Change password
+- 👤 Change profile picture
 
 ### 🛠️ Admin Panel (Gym Manager)
 - ➕ Add new users
 - ✅ Take attendance
 - 👥 View all members
 - 🔑 Change password
+- 🔍 Search member by name, username or id
 
 ---
 
 ## 🛠️ Tech Stack
 
 - **Backend:** Django (Python)
-- **Database:** SQLite 
-- **Frontend:** Django Templates (HTML, CSS)
-- **Auth:** Django’s built-in auth system
+- **Database:** SQLite3 
+- **Frontend:** Django Templates (HTML, CSS, JS)
+
+ *No external Api Used-* Build with pure Django logic
 
 ---
 
@@ -89,8 +92,8 @@ FITNESSPRO_DJANGO/
 │
 ├── FITNESSPRO/              # Django project folder
 ├── gym/                     # Main app containing models, views, templates
-├── admin_images/            # Admin saved images
-├── users_profile_images/    # Users profile images
+├── media/                   # saved media
+│     └── users_profile_images/    # Users profile images
 ├── screenshots/             # Project live demo screenshots
 ├── db.sqlite3               # Database file
 ├── manage.py
@@ -101,12 +104,20 @@ FITNESSPRO_DJANGO/
 
 ## 🙌 Acknowledgements
 
-- Built as a university/portfolio project
+- Built as a Portfolio project
 - Inspired by real-world gym operations
 
 ---
 
-## 📫 Contact
+## 🌐 Live Demo
 
-Fahad Ali  
-[LinkedIn](https://www.linkedin.com/in/fahadali1078) • [GitHub](https://github.com/FAHAD-ALI-github)
+[🔗 Live Site](https://fitnessprofahadali.pythonanywhere.com/)
+
+-----
+
+## 👤 Author
+
+**Fahad Ali**
+
+  * GitHub: [@FAHAD-ALI-github](https://github.com/FAHAD-ALI-github)
+  * LinkedIn: [fahadali1078](https://www.linkedin.com/in/fahadali1078/)
