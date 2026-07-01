@@ -1,0 +1,137 @@
+Gym management system :
+login signup:- login signup is different pages for all the actors - member, admin and trainer
+Membership:- monthly, yearly
+User Portal:-
+ On user portal we will show user information such as his age email address and phone number which you can edit whenever he wants.
+ Secondly we will show his exercises workout plan that is suggested by his trainer or he can see Any other workout plan from the list 
+ Thirdly we will show his diet plan that is suggested by his trainer or he can see/follow Any other deit plan from the list .
+Trainer portal:-
+ on Trainer portal, A trainer can create workout plan and add them to his library of workout plan
+ And trainer can create diet plan and add them to his library of diet plan.
+ He can assign diet plan or Workout plan to a member that is made by him or he can assign any default/premade workout plans that was added by the system in his trainer-profile.
+
+New User Registration :-
+-we get name age email phone number username and password from the user
+-User can add weight height later from his profile portal when he needs to know his BMI 
+-User will share a picture of payment while registering (in the last step of registering)
+Admin will approve the payment within 24 hours but the user is allowed to go to his profile with the warning that "Admin is approving your payment. After 24 hours this warning will be removed"
+
+Admin portal:-
+Admin get a approval request of payment proof when new user is registering
+Admin can approve or reject it.
+The other features of admin are 
+-see all members 
+-see a member profile (With limited personal information)
+-delete a member
+-search a number 
+-total revenue (All user.membershiptype * payment) 
+
+____________________________________________________________________________________
+
+
+
+Gym Management System: Detailed Requirements
+1. Project Name
+fitnesspro
+
+2. Actors of the System
+
+Admin
+
+Manages system-wide operations, including user accounts, memberships, revenue, and approval of new member registrations.
+
+Trainer
+
+Manages workout and diet plans, and assigns them to members.
+
+Member
+
+The end user who uses the system to view their personal profile, track their progress, and follow assigned workout and diet plans.
+
+3. Functional Requirements
+User Management
+FR-1.1: The system shall support three types of users: Admin, Trainer, and Member.
+
+FR-1.2: All users must be able to securely create an account and log in.
+
+FR-1.3: Members shall be able to update their personal information (age, email, phone number) on their profile.
+
+FR-1.4: Members shall be able to add their weight and height to automatically calculate and display their BMI.
+
+Membership & Registration
+FR-2.1: The system shall offer two membership types: monthly and yearly.
+
+FR-2.2: During registration, a new member must provide their full name, age, email, phone number, username, and password.
+
+FR-2.3: In the final step of registration, the member must upload a clear picture of their payment proof.
+
+FR-2.4: A newly registered member shall be granted limited access to their profile immediately, with a prominent warning message that their account is pending payment approval. This warning must be removed upon admin approval.
+
+FR-2.5: The Admin shall receive a request to approve or reject a new member's payment proof.
+
+FR-2.6: The Admin shall have the ability to approve or reject the new member's registration based on the payment proof.
+
+Workout Plan Management
+FR-3.1: Trainers shall be able to create a library of individual exercises with details like name, description, and target muscle group.
+
+FR-3.2: Trainers shall be able to create customizable workout plans by combining exercises from their library.
+
+FR-3.3: Trainers can assign these custom workout plans to their members.
+
+FR-3.4: The system shall contain a list of default/pre-made workout plans that trainers can also assign to members.
+
+FR-3.5: Members shall be able to view their assigned workout plan and track their progress by logging completed sets, reps, and weight.
+
+Diet Plan Management
+FR-4.1: Trainers shall be able to create a library of customizable diet plans.
+
+FR-4.2: Trainers can assign these diet plans to their members.
+
+FR-4.3: The system shall contain a list of default/pre-made diet plans that trainers can also assign to members.
+
+FR-4.4: Members shall be able to view their assigned diet plan and mark their progress.
+
+Admin Portal
+FR-5.1: The Admin shall have a dashboard to manage all members.
+
+FR-5.2: The Admin can view, search, and delete member accounts.
+
+FR-5.3: The Admin can view a member's profile with limited personal information.
+
+FR-5.4: The Admin shall have a dedicated section for new member payment approval requests.
+
+FR-5.5: The Admin dashboard can optionally display key analytics such as total revenue and the number of active members.
+
+4. Core Features by User Role
+Member Portal
+Profile: A dedicated page to view and edit personal information (name, age, email, phone number) and to input height and weight for BMI calculation.
+
+Workout Plan: A view to see the assigned workout plan and log daily progress.
+
+Diet Plan: A view to see the assigned diet plan.
+
+Trainer Portal
+Workout Library: A section to create, view, edit, and delete exercises and workout plans.
+
+Diet Plan Library: A section to create, view, edit, and delete diet plans.
+
+Member Management: A page to view all assigned members and assign new workout and diet plans.
+
+Admin Portal
+User Management: A master list of all members with search, view, and delete capabilities.
+
+Approval Queue: A dedicated page to view and act on pending member payment approvals.
+
+Analytics: A dashboard displaying key business metrics (optional).
+
+5. Basic Technical Stack
+Frontend: HTML, CSS, JavaScript (Django's built-in templating with JavaScript for interactivity).
+
+Backend: Django (Python).
+
+Database: PostgreSQL (SQL) or SQLite (for local development).
+
+___________________________________________________________
+
+
+

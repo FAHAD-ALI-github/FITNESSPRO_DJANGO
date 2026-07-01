@@ -1,0 +1,1662 @@
+
+===== updated_Gym-app_part1.txt =====
+
+===== admin.py =====
+from django.contrib import admin
+from .models import *
+
+
+# Register your models here.
+
+admin.site.register(Gym_split)
+admin.site.register(Address)
+admin.site.register(Gender)
+admin.site.register(Muscle_strength)
+admin.site.register(Gym_user)
+
+
+
+===== models.py =====
+from django.db import models
+from django.core.validators import MinValueValidator
+from decimal import Decimal
+
+# Existing models (kept as-is)
+
+class Gym_split(models.Model):
+    split_name = models.CharField(max_length=500)
+    
+    def __str__(self):
+        return self.split_name
+
+
+class Gender(models.Model):
+    gender = models.CharField(max_length=30)
+    
+    def __str__(self):
+        return self.gender
+
+
+class Muscle_strength(models.Model):
+    type = models.CharField(max_length=20)
+    
+    def __str__(self):
+        return self.type
+
+
+class Address(models.Model):
+    area = models.CharField(max_length=30)
+    
+    def __str__(self):
+        return self.area
+
+
+# NEW MODEL: Trainer
+class Trainer(models.Model):
+    first_name = models.CharField(max_length=50)
+    last_name = models.CharField(max_length=50)
+    email = models.EmailField(unique=True)
+    username = models.CharField(max_length=150, unique=True)
+    password = models.CharField(max_length=100)
+    phone_number = models.CharField(max_length=20)
+    specialization = models.CharField(max_length=100, blank=True)
+    date_of_joining = models.DateTimeField(auto_now_add=True)
+    is_active = models.BooleanField(default=True)
+    profile_image = models.ImageField(
+        upload_to="trainers_profile_images/", 
+        default="trainers_profile_images/default.png"
+    )
+    
+    def __str__(self):
+        return f"{self.first_name} {self.last_name}"
+    
+    @staticmethod
+    def get_trainer_by_username(username):
+        try:
+            return Trainer.objects.get(username=username)
+        except Trainer.DoesNotExist:
+            return None
+    
+    @staticmethod
+    def get_all_trainers():
+        return Trainer.objects.all()
+    
+    @staticmethod
+    def get_active_trainers():
+        return Trainer.objects.filter(is_active=True)
+
+
+# NEW MODEL: Membership Plan
+class MembershipPlan(models.Model):
+    plan_name = models.CharField(max_length=100)
+    duration_months = models.IntegerField(validators=[MinValueValidator(1)])
+    price = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(Decimal('0.01'))])
+    description = models.TextField(blank=True)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return f"{self.plan_name} - {self.duration_months} month(s) - Rs.{self.price}"
+    
+    @staticmethod
+    def get_active_plans():
+        return MembershipPlan.objects.filter(is_active=True)
+
+
+# NEW MODEL: Payment Proof
+class PaymentProof(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+    ]
+    
+    # Temporary data before user creation
+    temp_first_name = models.CharField(max_length=50)
+    temp_last_name = models.CharField(max_length=50)
+    temp_email = models.EmailField()
+    temp_phone = models.CharField(max_length=20)
+    
+    # Membership and payment details
+    membership_plan = models.ForeignKey(MembershipPlan, on_delete=models.CASCADE)
+    payment_image = models.ImageField(upload_to="payment_proofs/")
+    amount_paid = models.DecimalField(max_digits=10, decimal_places=2)
+    
+    # Status tracking
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    submitted_at = models.DateTimeField(auto_now_add=True)
+    reviewed_at = models.DateTimeField(null=True, blank=True)
+    rejection_reason = models.TextField(blank=True)
+    
+    def __str__(self):
+        return f"{self.temp_first_name} {self.temp_last_name} - {self.status}"
+    
+    @staticmethod
+    def get_pending_payments():
+        return PaymentProof.objects.filter(status='pending').order_by('-submitted_at')
+    
+    @staticmethod
+    def get_by_id(payment_id):
+        try:
+            return PaymentProof.objects.get(id=payment_id)
+        except PaymentProof.DoesNotExist:
+            return None
+
+
+# MODIFIED MODEL: Gym_user
+class Gym_user(models.Model):
+    # Basic info
+    first_name = models.CharField(max_length=50)
+    last_name = models.CharField(max_length=50)
+    dob = models.DateField()
+    phone_number = models.CharField(max_length=20)
+    email = models.CharField(max_length=50, null=True, blank=True)
+    
+    # Account credentials
+    username = models.CharField(max_length=150, unique=True, null=True, blank=True)
+    password = models.CharField(max_length=100, null=True, blank=True)
+    
+    # Physical attributes
+    image = models.ImageField(
+        upload_to="users_profile_images/", 
+        default="users_profile_images/image.png"
+    )
+    weight = models.IntegerField()
+    height = models.IntegerField()
+    
+    # Gym-related info
+    address = models.ForeignKey(Address, on_delete=models.CASCADE)
+    gender = models.ForeignKey(Gender, on_delete=models.CASCADE)
+    gym_split = models.ForeignKey(Gym_split, on_delete=models.CASCADE)
+    muscle_strength = models.ForeignKey(Muscle_strength, on_delete=models.CASCADE)
+    
+    # NEW: Membership and approval fields
+    membership_plan = models.ForeignKey(MembershipPlan, on_delete=models.SET_NULL, null=True, blank=True)
+    payment_proof = models.OneToOneField(PaymentProof, on_delete=models.SET_NULL, null=True, blank=True)
+    is_approved = models.BooleanField(default=False)
+    approval_date = models.DateTimeField(null=True, blank=True)
+    membership_start_date = models.DateField(null=True, blank=True)
+    membership_end_date = models.DateField(null=True, blank=True)
+    assigned_trainer = models.ForeignKey(Trainer, on_delete=models.SET_NULL, null=True, blank=True)
+    
+    # Timestamps
+    date_of_joining = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return f"{self.first_name} {self.last_name}"
+    
+    @property
+    def is_membership_active(self):
+        if not self.membership_end_date:
+            return False
+        from datetime import date
+        return date.today() <= self.membership_end_date
+    
+    @staticmethod
+    def get_all_users():
+        return Gym_user.objects.all()
+    
+    @staticmethod
+    def get_user_by_id(user_id):
+        try:
+            return Gym_user.objects.get(id=user_id)
+        except Gym_user.DoesNotExist:
+            return None
+    
+    @staticmethod
+    def get_searched_members(query):
+        return Gym_user.objects.filter(first_name__icontains=query)
+    
+    @staticmethod
+    def by_lastName(query):
+        return Gym_user.objects.filter(last_name__icontains=query)
+    
+    @staticmethod
+    def by_username(query):
+        return Gym_user.objects.filter(username__icontains=query)
+    
+    @staticmethod
+    def by_id(query):
+        try:
+            return Gym_user.objects.filter(id=int(query))
+        except ValueError:
+            return Gym_user.objects.none()
+    
+    @staticmethod
+    def by_dob(query):
+        return Gym_user.objects.filter(dob__contains=query)
+    
+    @staticmethod
+    def get_username_authen(username):
+        return Gym_user.objects.filter(username=username)
+    
+    @staticmethod
+    def get_user_by_username(username):
+        try:
+            return Gym_user.objects.get(username=username)
+        except Gym_user.DoesNotExist:
+            return None
+    
+    @staticmethod
+    def get_users_by_trainer(trainer_id):
+        return Gym_user.objects.filter(assigned_trainer_id=trainer_id, is_approved=True)
+
+
+# NEW MODEL: Workout Plan
+class WorkoutPlan(models.Model):
+    plan_name = models.CharField(max_length=200)
+    trainer = models.ForeignKey(Trainer, on_delete=models.CASCADE)
+    muscle_strength = models.ForeignKey(Muscle_strength, on_delete=models.CASCADE)
+    gym_split = models.ForeignKey(Gym_split, on_delete=models.CASCADE)
+    day_of_week = models.CharField(max_length=20)  # Monday, Tuesday, etc.
+    target_muscle_group = models.CharField(max_length=50)  # chest, back, legs, etc.
+    exercises = models.TextField()  # Store as JSON string or plain text
+    sets_reps = models.TextField()  # Store as JSON string or plain text
+    notes = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return f"{self.plan_name} - {self.day_of_week} ({self.target_muscle_group})"
+    
+    @staticmethod
+    def get_plan_for_user(gym_split_id, muscle_strength_id, day):
+        try:
+            return WorkoutPlan.objects.filter(
+                gym_split_id=gym_split_id,
+                muscle_strength_id=muscle_strength_id,
+                day_of_week=day
+            ).first()
+        except:
+            return None
+    
+    @staticmethod
+    def get_plans_by_trainer(trainer_id):
+        return WorkoutPlan.objects.filter(trainer_id=trainer_id)
+
+
+# NEW MODEL: Diet Plan
+class DietPlan(models.Model):
+    GOAL_CHOICES = [
+        ('weight_loss', 'Weight Loss'),
+        ('muscle_gain', 'Muscle Gain'),
+        ('maintenance', 'Maintenance'),
+    ]
+    
+    plan_name = models.CharField(max_length=200)
+    trainer = models.ForeignKey(Trainer, on_delete=models.CASCADE)
+    target_goal = models.CharField(max_length=20, choices=GOAL_CHOICES)
+    calorie_range = models.CharField(max_length=50)  # e.g., "2000-2500"
+    meal_breakdown = models.TextField()  # Store as JSON or formatted text
+    protein_grams = models.IntegerField()
+    carbs_grams = models.IntegerField()
+    fats_grams = models.IntegerField()
+    notes = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return f"{self.plan_name} - {self.target_goal}"
+    
+    @staticmethod
+    def get_plan_by_goal(goal):
+        return DietPlan.objects.filter(target_goal=goal).first()
+    
+    @staticmethod
+    def get_plans_by_trainer(trainer_id):
+        return DietPlan.objects.filter(trainer_id=trainer_id)
+
+
+# NEW MODEL: Trainer Attendance
+class TrainerAttendance(models.Model):
+    trainer = models.ForeignKey(Trainer, on_delete=models.CASCADE)
+    date = models.DateField()
+    check_in_time = models.TimeField(null=True, blank=True)
+    check_out_time = models.TimeField(null=True, blank=True)
+    is_present = models.BooleanField(default=False)
+    notes = models.TextField(blank=True)
+    
+    class Meta:
+        unique_together = ['trainer', 'date']
+        ordering = ['-date']
+    
+    def __str__(self):
+        return f"{self.trainer.first_name} - {self.date} - {'Present' if self.is_present else 'Absent'}"
+    
+    @staticmethod
+    def get_attendance_by_trainer(trainer_id, start_date=None, end_date=None):
+        query = TrainerAttendance.objects.filter(trainer_id=trainer_id)
+        if start_date:
+            query = query.filter(date__gte=start_date)
+        if end_date:
+            query = query.filter(date__lte=end_date)
+        return query
+    
+    @staticmethod
+    def mark_attendance(trainer_id, date, check_in=None, check_out=None):
+        attendance, created = TrainerAttendance.objects.get_or_create(
+            trainer_id=trainer_id,
+            date=date,
+            defaults={'is_present': True, 'check_in_time': check_in}
+        )
+        if not created and check_out:
+            attendance.check_out_time = check_out
+            attendance.save()
+        return attendance
+
+
+===== urls.py =====
+from django.urls import path
+from .views import *
+from . import views
+
+urlpatterns = [
+    # Public routes
+    path('', home, name='home'),
+    path('contact', contact_us, name='contact_us'),
+    
+    # PRE-REGISTRATION ROUTES (NEW)
+    path('pre-register', pre_register_view, name='pre_register'),
+    path('payment-upload', payment_proof_upload, name='payment_upload'),
+    path('registration-pending', registration_pending, name='registration_pending'),
+    path('check-registration-status', check_registration_status, name='check_status'),
+    
+    # USER ROUTES (MODIFIED)
+    path('login', login, name='login'),
+    path('profile_page', profilePage, name='profile_page'),
+    path('diet_plan', diet_plan, name='diet_plan'),
+    path('workout_plan', workout_plan, name='workout_plan'),
+    path('workout', workout, name='workout'),
+    path('upload_profile_image/', views.upload_profile_image, name='upload_profile_image'),
+    path('change_user_password', change_user_password, name='change_user_password'),
+    path('delete_user', delete_profbyuser, name='delete_profbyuser'),
+    path('user_logout', user_logout, name='user_logout'),
+    
+    # ADMIN ROUTES (MODIFIED & NEW)
+    path('admin_login', admin_login, name='admin_login'),
+    path('admin_portal', admin_portal, name='admin_portal'),
+    path('admin_logout', admin_logout, name='admin_logout'),
+    path('change_admin_password', change_admin_password, name='change_admin_password'),
+    
+    # Admin - Member Management
+    path('all_members', all_members, name='all_members'),
+    path('userdetails', userdetails, name='userdetails'),
+    path('searchPage', searchPage, name='searchPage'),
+    path('delete', delete_user, name='delete_user'),
+    
+    # Admin - Payment Approval (NEW)
+    path('payment-approval-queue', payment_approval_queue, name='payment_approval_queue'),
+    path('approve-payment/<int:payment_id>/', approve_payment, name='approve_payment'),
+    path('create-user-from-payment', create_user_from_payment, name='create_user_from_payment'),
+    path('reject-payment/<int:payment_id>/', reject_payment, name='reject_payment'),
+    
+    # Admin - Trainer Management (NEW)
+    path('manage-trainers', manage_trainers, name='manage_trainers'),
+    path('create-trainer', create_trainer, name='create_trainer'),
+    path('edit-trainer/<int:trainer_id>/', edit_trainer, name='edit_trainer'),
+    path('delete-trainer/<int:trainer_id>/', delete_trainer, name='delete_trainer'),
+    path('trainer-details/<int:trainer_id>/', trainer_details, name='trainer_details'),
+    
+    # Admin - Trainer Attendance View (NEW)
+    path('trainer-attendance-view', trainer_attendance_view, name='trainer_attendance_view'),
+    
+    # Admin - Membership Plans (NEW)
+    path('manage-membership-plans', manage_membership_plans, name='manage_membership_plans'),
+    path('create-membership-plan', create_membership_plan, name='create_membership_plan'),
+    path('edit-membership-plan/<int:plan_id>/', edit_membership_plan, name='edit_membership_plan'),
+    path('delete-membership-plan/<int:plan_id>/', delete_membership_plan, name='delete_membership_plan'),
+    
+    # TRAINER ROUTES (NEW)
+    path('trainer-login', trainer_login, name='trainer_login'),
+    path('trainer-portal', trainer_portal, name='trainer_portal'),
+    path('trainer-logout', trainer_logout, name='trainer_logout'),
+    path('trainer-clients', trainer_clients, name='trainer_clients'),
+    path('trainer-profile', trainer_profile, name='trainer_profile'),
+    path('trainer-change-password', trainer_change_password, name='trainer_change_password'),
+    
+    # Trainer - Workout Plans (NEW)
+    path('create-workout-plan', create_workout_plan, name='create_workout_plan'),
+    path('view-workout-plans', view_workout_plans, name='view_workout_plans'),
+    path('edit-workout-plan/<int:plan_id>/', edit_workout_plan, name='edit_workout_plan'),
+    path('delete-workout-plan/<int:plan_id>/', delete_workout_plan, name='delete_workout_plan'),
+    
+    # Trainer - Diet Plans (NEW)
+    path('create-diet-plan', create_diet_plan, name='create_diet_plan'),
+    path('view-diet-plans', view_diet_plans, name='view_diet_plans'),
+    path('edit-diet-plan/<int:plan_id>/', edit_diet_plan, name='edit_diet_plan'),
+    path('delete-diet-plan/<int:plan_id>/', delete_diet_plan, name='delete_diet_plan'),
+    
+    # Trainer - Attendance (NEW)
+    path('trainer-mark-attendance', trainer_mark_attendance, name='trainer_mark_attendance'),
+]
+
+
+
+
+===== updated_Gym-app_part2.txt =====
+
+===== views.py =====
+from django.shortcuts import render, redirect
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
+from django.utils import timezone
+from datetime import datetime, timedelta, date
+from .models import *
+import json
+
+# ============================================================
+# ADMIN CREDENTIALS (Hardcoded)
+# ============================================================
+ADMIN_CREDENTIALS = {
+    'username': 'admin',
+    'password': 'admin123',
+    'first_name': 'Admin',
+    'last_name': 'User',
+    'email': 'admin@gym.com',
+    'phone_number': '1234567890'
+}
+
+
+# ============================================================
+# AUTHENTICATION DECORATORS
+# ============================================================
+def admin_login_required(view_func):
+    def wrapper(request, *args, **kwargs):
+        if 'admin_logged_in' not in request.session:
+            return redirect('/admin_login')
+        return view_func(request, *args, **kwargs)
+    return wrapper
+
+
+def trainer_login_required(view_func):
+    def wrapper(request, *args, **kwargs):
+        if 'trainer_id' not in request.session:
+            return redirect('/trainer-login')
+        return view_func(request, *args, **kwargs)
+    return wrapper
+
+
+def user_login_required(view_func):
+    def wrapper(request, *args, **kwargs):
+        if 'user_id' not in request.session:
+            return redirect('/login')
+        return view_func(request, *args, **kwargs)
+    return wrapper
+
+
+# ============================================================
+# UTILITY FUNCTIONS
+# ============================================================
+def calculate_bmi(weight, height):
+    """Calculate BMI and return BMI value and category"""
+    bmi = weight / ((height / 100) ** 2)
+    bmi = round(bmi, 2)
+    
+    if bmi < 18.5:
+        category = "Underweight"
+    elif bmi < 25:
+        category = "Normal weight"
+    elif bmi < 30:
+        category = "Overweight"
+    else:
+        category = "Obese"
+    
+    return bmi, category
+
+
+def calculate_membership_dates(start_date, months):
+    """Calculate membership end date based on start date and duration"""
+    end_date = start_date + timedelta(days=30 * months)
+    return end_date
+
+
+# ============================================================
+# PUBLIC ROUTES
+# ============================================================
+def home(request):
+    return render(request, "home.html")
+
+
+def contact_us(request):
+    return render(request, 'contact.html')
+
+
+# ============================================================
+# PRE-REGISTRATION ROUTES (NEW)
+# ============================================================
+def pre_register_view(request):
+    """Step 1: User selects membership plan and enters basic info"""
+    data = {}
+    
+    if request.method == "POST":
+        # Get form data
+        first_name = request.POST.get("firstname")
+        last_name = request.POST.get("lastname")
+        email = request.POST.get("email")
+        phone = request.POST.get("phone")
+        plan_id = request.POST.get("membership_plan")
+        
+        # Validation
+        error = ""
+        if not all([first_name, last_name, email, phone, plan_id]):
+            error = "All fields are required"
+        elif len(first_name) < 2 or len(last_name) < 2:
+            error = "Name must be at least 2 characters"
+        elif len(phone) < 10:
+            error = "Invalid phone number"
+        
+        if error:
+            data["error"] = error
+            data["first_name"] = first_name
+            data["last_name"] = last_name
+            data["email"] = email
+            data["phone"] = phone
+        else:
+            # Store in session for next step
+            request.session['prereg_data'] = {
+                'first_name': first_name.strip(),
+                'last_name': last_name.strip(),
+                'email': email.strip(),
+                'phone': phone.strip(),
+                'plan_id': plan_id
+            }
+            return redirect('/payment-upload')
+    
+    # Get active membership plans
+    data['plans'] = MembershipPlan.get_active_plans()
+    return render(request, 'pre_register.html', data)
+
+
+def payment_proof_upload(request):
+    """Step 2: User uploads payment proof"""
+    data = {}
+    
+    # Check if pre-registration data exists
+    prereg_data = request.session.get('prereg_data')
+    if not prereg_data:
+        return redirect('/pre-register')
+    
+    if request.method == "POST":
+        payment_image = request.FILES.get('payment_image')
+        amount_paid = request.POST.get('amount_paid')
+        
+        error = ""
+        if not payment_image:
+            error = "Payment proof image is required"
+        elif not amount_paid:
+            error = "Amount paid is required"
+        
+        if error:
+            data["error"] = error
+        else:
+            try:
+                # Create PaymentProof record
+                plan = MembershipPlan.objects.get(id=prereg_data['plan_id'])
+                
+                payment_proof = PaymentProof.objects.create(
+                    temp_first_name=prereg_data['first_name'],
+                    temp_last_name=prereg_data['last_name'],
+                    temp_email=prereg_data['email'],
+                    temp_phone=prereg_data['phone'],
+                    membership_plan=plan,
+                    payment_image=payment_image,
+                    amount_paid=amount_paid,
+                    status='pending'
+                )
+                
+                # Clear session data
+                del request.session['prereg_data']
+                
+                # Store payment proof ID for status checking
+                request.session['payment_proof_id'] = payment_proof.id
+                
+                return redirect('/registration-pending')
+                
+            except Exception as e:
+                data["error"] = f"Error: {str(e)}"
+    
+    data['prereg_data'] = prereg_data
+    data['plan'] = MembershipPlan.objects.get(id=prereg_data['plan_id'])
+    return render(request, 'payment_upload.html', data)
+
+
+def registration_pending(request):
+    """Confirmation page after payment upload"""
+    payment_proof_id = request.session.get('payment_proof_id')
+    data = {}
+    
+    if payment_proof_id:
+        try:
+            payment = PaymentProof.objects.get(id=payment_proof_id)
+            data['payment'] = payment
+        except PaymentProof.DoesNotExist:
+            pass
+    
+    return render(request, 'registration_pending.html', data)
+
+
+def check_registration_status(request):
+    """Allow users to check their registration status"""
+    data = {}
+    
+    if request.method == "POST":
+        email = request.POST.get("email")
+        phone = request.POST.get("phone")
+        
+        try:
+            payment = PaymentProof.objects.filter(
+                temp_email=email,
+                temp_phone=phone
+            ).order_by('-submitted_at').first()
+            
+            if payment:
+                data['payment'] = payment
+                data['found'] = True
+            else:
+                data['error'] = "No registration found with provided details"
+        except Exception as e:
+            data['error'] = "Error checking status"
+    
+    return render(request, 'check_registration_status.html', data)
+
+
+# ============================================================
+# USER LOGIN & PROFILE (MODIFIED)
+# ============================================================
+def login(request):
+    """User login - Modified to check approval status"""
+    data = {}
+    
+    if request.method == "POST":
+        username = request.POST.get("u_username")
+        password = request.POST.get("u_password")
+        
+        user_data = Gym_user.get_user_by_username(username)
+        
+        if user_data:
+            # Check if user is approved
+            if not user_data.is_approved:
+                data["error"] = "Your account is pending admin approval. Please check your registration status."
+                return render(request, 'login_page.html', data)
+            
+            if user_data.password == password:
+                # Set session
+                request.session['user_id'] = user_data.id
+                request.session['user_username'] = user_data.username
+                
+                # Calculate BMI
+                bmi, category = calculate_bmi(user_data.weight, user_data.height)
+                
+                # Get current day
+                today = datetime.now()
+                
+                data['bmi'] = bmi
+                data['bmi_status'] = category
+                data['today'] = today.strftime("%A")
+                data['user'] = user_data
+                
+                return render(request, "profile_page.html", data)
+            else:
+                data["error"] = "Password is incorrect!"
+        else:
+            data["error"] = "Incorrect username or password!"
+    
+    return render(request, 'login_page.html', data)
+
+
+def user_logout(request):
+    """User logout"""
+    if 'user_id' in request.session:
+        del request.session['user_id']
+    if 'user_username' in request.session:
+        del request.session['user_username']
+    return redirect('/')
+
+
+@user_login_required
+def profilePage(request):
+    """User profile page - Modified to show membership and trainer info"""
+    user_id = request.session.get('user_id')
+    
+    if not user_id:
+        return redirect('/login')
+    
+    user = Gym_user.get_user_by_id(user_id)
+    if not user:
+        return redirect('/login')
+    
+    data = {}
+    data['user'] = user
+    
+    # Calculate BMI
+    bmi, category = calculate_bmi(user.weight, user.height)
+    data['bmi'] = bmi
+    data['bmi_status'] = category
+    
+    # Current day
+    data['today'] = datetime.now().strftime("%A")
+    
+    # Membership status
+    data['membership_active'] = user.is_membership_active
+    
+    return render(request, 'profile_page.html', data)
+
+
+def change_user_password(request):
+    """Change user password"""
+    data = {}
+    
+    if request.method == "GET":
+        user_id = request.GET.get("u_id")
+        if user_id:
+            user = Gym_user.get_user_by_id(user_id)
+            data["user"] = user
+            return render(request, 'change_user_password.html', data)
+    
+    if request.method == "POST":
+        user_id = request.POST.get("user_id")
+        new_password = request.POST.get("n_pass")
+        
+        user_data = Gym_user.get_user_by_id(user_id)
+        if user_data:
+            user_data.password = new_password
+            user_data.save()
+            data["msg"] = "Password has been changed successfully!"
+            data["user"] = user_data
+    
+    return render(request, 'change_user_password.html', data)
+
+
+def delete_profbyuser(request):
+    """User deletes their own profile"""
+    user_id = request.GET.get("u_id")
+    user = Gym_user.get_user_by_id(user_id)
+    if user:
+        user.delete()
+    return redirect("/")
+
+
+@csrf_exempt
+@require_POST
+def upload_profile_image(request):
+    """Upload user profile image"""
+    try:
+        user_id = request.POST.get('user_id') or request.GET.get('u_id')
+        
+        if not user_id:
+            return JsonResponse({'success': False, 'message': 'User ID is required.'})
+        
+        user = Gym_user.get_user_by_id(int(user_id))
+        if not user:
+            return JsonResponse({'success': False, 'message': 'User does not exist.'})
+        
+        if 'image' in request.FILES:
+            image_file = request.FILES['image']
+            
+            # Validate file type
+            allowed_types = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp']
+            if image_file.content_type not in allowed_types:
+                return JsonResponse({'success': False, 'message': 'Invalid file type.'})
+            
+            # Validate file size (5MB limit)
+            if image_file.size > 5 * 1024 * 1024:
+                return JsonResponse({'success': False, 'message': 'File too large. Max 5MB.'})
+            
+            # Delete old image if not default
+            if user.image and user.image.name != "users_profile_images/image.png":
+                try:
+                    user.image.delete(save=False)
+                except:
+                    pass
+            
+            # Save new image
+            user.image.save(image_file.name, image_file, save=True)
+            
+            return JsonResponse({
+                'success': True,
+                'message': 'Profile picture updated successfully!',
+                'image_url': user.image.url
+            })
+        else:
+            return JsonResponse({'success': False, 'message': 'No image file provided.'})
+            
+    except ValueError:
+        return JsonResponse({'success': False, 'message': 'Invalid user ID format.'})
+    except Exception as e:
+        return JsonResponse({'success': False, 'message': f'An error occurred: {str(e)}'})
+
+
+# ============================================================
+# USER WORKOUT & DIET PLANS (MODIFIED)
+# ============================================================
+@user_login_required
+def workout_plan(request):
+    """Display workout plan overview"""
+    user_id = request.session.get('user_id')
+    user = Gym_user.get_user_by_id(user_id)
+    
+    data = {}
+    data['user'] = user
+    data['today'] = datetime.now().strftime("%A")
+    
+    return render(request, 'workout_plan.html', data)
+
+
+@user_login_required
+def workout(request):
+    """Display today's workout - Modified to fetch from database"""
+    user_id = request.session.get('user_id')
+    user = Gym_user.get_user_by_id(user_id)
+    
+    data = {}
+    data['user'] = user
+    
+    today = datetime.now()
+    data['today'] = today.strftime("%A")
+    
+    # Fetch workout plan from database
+    workout_plan = WorkoutPlan.get_plan_for_user(
+        user.gym_split_id,
+        user.muscle_strength_id,
+        data['today']
+    )
+    
+    if workout_plan:
+        data['workout_plan'] = workout_plan
+        data['exercise'] = workout_plan.target_muscle_group
+    else:
+        data['no_plan'] = True
+        data['message'] = "No workout plan available for today. Please contact your trainer."
+    
+    return render(request, 'workout.html', data)
+
+
+@user_login_required
+def diet_plan(request):
+    """Display diet plan - Modified to fetch from database"""
+    user_id = request.session.get('user_id')
+    user = Gym_user.get_user_by_id(user_id)
+    
+    data = {}
+    data['user'] = user
+    
+    # Fetch diet plan from database (default to maintenance if no specific goal)
+    diet_plan = DietPlan.get_plan_by_goal('maintenance')
+    
+    if diet_plan:
+        data['diet_plan'] = diet_plan
+    else:
+        data['no_plan'] = True
+        data['message'] = "No diet plan available. Please contact your trainer."
+    
+    return render(request, 'diet_plan.html', data)
+
+
+# ============================================================
+# ADMIN AUTHENTICATION
+# ============================================================
+def admin_login(request):
+    """Admin login with hardcoded credentials"""
+    data = {}
+    
+    if request.method == "POST":
+        username = request.POST.get("a_username")
+        password = request.POST.get("a_password")
+        
+        if username == ADMIN_CREDENTIALS['username'] and password == ADMIN_CREDENTIALS['password']:
+            request.session['admin_logged_in'] = True
+            request.session['admin_username'] = username
+            
+            data["admin"] = ADMIN_CREDENTIALS.copy()
+            return render(request, "admin_portal.html", data)
+        else:
+            data["error"] = "Incorrect username or password!"
+    
+    return render(request, 'admin_login.html', data)
+
+
+@admin_login_required
+def admin_portal(request):
+    """Admin dashboard - Modified with new features"""
+    data = {}
+    data['admin'] = ADMIN_CREDENTIALS.copy()
+    
+    # Statistics
+    data['total_members'] = Gym_user.objects.filter(is_approved=True).count()
+    data['pending_payments'] = PaymentProof.get_pending_payments().count()
+    data['total_trainers'] = Trainer.objects.filter(is_active=True).count()
+    data['total_plans'] = MembershipPlan.objects.filter(is_active=True).count()
+    
+    return render(request, 'admin_portal.html', data)
+
+
+def admin_logout(request):
+    """Admin logout"""
+    if 'admin_logged_in' in request.session:
+        del request.session['admin_logged_in']
+    if 'admin_username' in request.session:
+        del request.session['admin_username']
+    return redirect('/')
+
+
+@admin_login_required
+def change_admin_password(request):
+    """Change admin password"""
+    global ADMIN_CREDENTIALS
+    data = {}
+    data["admin"] = ADMIN_CREDENTIALS.copy()
+    
+    if request.method == "POST":
+        new_password = request.POST.get("n_pass")
+        ADMIN_CREDENTIALS['password'] = new_password
+        data["msg"] = "Password has been changed successfully!"
+    
+    return render(request, 'change_admin_password.html', data)
+
+
+# ============================================================
+# ADMIN - MEMBER MANAGEMENT
+# ============================================================
+@admin_login_required
+def all_members(request):
+    """View all approved members"""
+    members = Gym_user.get_all_users()
+    data = {'users': members}
+    return render(request, 'all_members.html', data)
+
+
+@admin_login_required
+def userdetails(request):
+    """View detailed user information"""
+    user_id = request.GET.get("u_id")
+    user = Gym_user.get_user_by_id(int(user_id))
+    
+    data = {}
+    data["a_user"] = user
+    
+    # Calculate BMI
+    bmi, category = calculate_bmi(user.weight, user.height)
+    data['bmi'] = bmi
+    data['bmi_status'] = category
+    
+    return render(request, 'userdetails.html', data)
+
+
+@admin_login_required
+def searchPage(request):
+    """Search members"""
+    query = request.POST.get("searchedMember")
+    
+    searchedMember = Gym_user.get_searched_members(query)
+    if not searchedMember:
+        searchedMember = Gym_user.by_lastName(query)
+        if not searchedMember:
+            searchedMember = Gym_user.by_id(query)
+            if not searchedMember:
+                searchedMember = Gym_user.by_username(query)
+                if not searchedMember:
+                    searchedMember = Gym_user.by_dob(query)
+    
+    data = {"members": searchedMember}
+    return render(request, 'searchPage.html', data)
+
+
+@admin_login_required
+def delete_user(request):
+    """Delete user account"""
+    user_id = request.GET.get("u_id")
+    user = Gym_user.get_user_by_id(user_id)
+    if user:
+        user.delete()
+    return redirect("/all_members")
+
+
+# ============================================================
+# ADMIN - PAYMENT APPROVAL (NEW)
+# ============================================================
+@admin_login_required
+def payment_approval_queue(request):
+    """View all pending payment proofs"""
+    data = {}
+    pending_payments = PaymentProof.get_pending_payments()
+    data['payments'] = pending_payments
+    
+    return render(request, 'payment_approval_queue.html', data)
+
+
+@admin_login_required
+def approve_payment(request, payment_id):
+    """Approve payment and show user creation form"""
+    payment = PaymentProof.get_by_id(payment_id)
+    
+    if not payment:
+        return redirect('/payment-approval-queue')
+    
+    data = {}
+    data['payment'] = payment
+    data['addresses'] = Address.objects.all()
+    data['genders'] = Gender.objects.all()
+    data['gym_splits'] = Gym_split.objects.all()
+    data['muscle_strengths'] = Muscle_strength.objects.all()
+    data['trainers'] = Trainer.get_active_trainers()
+    
+    return render(request, 'approve_payment_form.html', data)
+
+
+@admin_login_required
+def create_user_from_payment(request):
+    """Create user account after payment approval"""
+    if request.method == "POST":
+        payment_id = request.POST.get("payment_id")
+        payment = PaymentProof.get_by_id(payment_id)
+        
+        if not payment:
+            return redirect('/payment-approval-queue')
+        
+        # Get form data
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+        dob = request.POST.get("dob")
+        height = request.POST.get("height")
+        weight = request.POST.get("weight")
+        address_id = request.POST.get("address")
+        gender_id = request.POST.get("gender")
+        gym_split_id = request.POST.get("gym_split")
+        muscle_strength_id = request.POST.get("muscle_strength")
+        trainer_id = request.POST.get("trainer")
+        
+        # Validation
+        error = ""
+        if Gym_user.get_username_authen(username).exists():
+            error = "Username already exists"
+        
+        if not error:
+            # Calculate membership dates
+            start_date = date.today()
+            end_date = calculate_membership_dates(start_date, payment.membership_plan.duration_months)
+            
+            # Create user
+            user = Gym_user.objects.create(
+                first_name=payment.temp_first_name,
+                last_name=payment.temp_last_name,
+                email=payment.temp_email,
+                phone_number=payment.temp_phone,
+                username=username,
+                password=password,
+                dob=dob,
+                height=height,
+                weight=weight,
+                address_id=address_id,
+                gender_id=gender_id,
+                gym_split_id=gym_split_id,
+                muscle_strength_id=muscle_strength_id,
+                membership_plan=payment.membership_plan,
+                payment_proof=payment,
+                is_approved=True,
+                approval_date=timezone.now(),
+                membership_start_date=start_date,
+                membership_end_date=end_date,
+                assigned_trainer_id=trainer_id if trainer_id else None
+            )
+            
+            # Update payment status
+            payment.status = 'approved'
+            payment.reviewed_at = timezone.now()
+            payment.save()
+            
+            return redirect('/payment-approval-queue')
+        else:
+            data = {}
+            data['error'] = error
+            data['payment'] = payment
+            data['addresses'] = Address.objects.all()
+            data['genders'] = Gender.objects.all()
+            data['gym_splits'] = Gym_split.objects.all()
+            data['muscle_strengths'] = Muscle_strength.objects.all()
+            data['trainers'] = Trainer.get_active_trainers()
+            return render(request, 'approve_payment_form.html', data)
+    
+    return redirect('/payment-approval-queue')
+
+
+@admin_login_required
+def reject_payment(request, payment_id):
+    """Reject payment proof"""
+    payment = PaymentProof.get_by_id(payment_id)
+    
+    if request.method == "POST":
+        rejection_reason = request.POST.get("rejection_reason")
+        
+        if payment:
+            payment.status = 'rejected'
+            payment.rejection_reason = rejection_reason
+            payment.reviewed_at = timezone.now()
+            payment.save()
+        
+        return redirect('/payment-approval-queue')
+    
+    data = {'payment': payment}
+    return render(request, 'reject_payment_form.html', data)
+
+
+# ============================================================
+# ADMIN - TRAINER MANAGEMENT (NEW)
+# ============================================================
+@admin_login_required
+def manage_trainers(request):
+    """View all trainers"""
+    trainers = Trainer.get_all_trainers()
+    data = {'trainers': trainers}
+    return render(request, 'manage_trainers.html', data)
+
+
+@admin_login_required
+def create_trainer(request):
+    """Create new trainer account"""
+    data = {}
+    
+    if request.method == "POST":
+        first_name = request.POST.get("firstname")
+        last_name = request.POST.get("lastname")
+        email = request.POST.get("email")
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+        phone = request.POST.get("phone")
+        specialization = request.POST.get("specialization")
+        
+        error = ""
+        
+        # Validation
+        if Trainer.objects.filter(username=username).exists():
+            error = "Username already exists"
+        elif Trainer.objects.filter(email=email).exists():
+            error = "Email already exists"
+        
+        if not error:
+            Trainer.objects.create(
+                first_name=first_name,
+                last_name=last_name,
+                email=email,
+                username=username,
+                password=password,
+                phone_number=phone,
+                specialization=specialization
+            )
+            return redirect('/manage-trainers')
+        else:
+            data['error'] = error
+    
+    return render(request, 'create_trainer.html', data)
+
+
+@admin_login_required
+def edit_trainer(request, trainer_id):
+    """Edit trainer details"""
+    trainer = Trainer.objects.get(id=trainer_id)
+    data = {'trainer': trainer}
+    
+    if request.method == "POST":
+        trainer.first_name = request.POST.get("firstname")
+        trainer.last_name = request.POST.get("lastname")
+        trainer.email = request.POST.get("email")
+        trainer.phone_number = request.POST.get("phone")
+        trainer.specialization = request.POST.get("specialization")
+        trainer.is_active = request.POST.get("is_active") == "on"
+        trainer.save()
+        
+        return redirect('/manage-trainers')
+    
+    return render(request, 'edit_trainer.html', data)
+
+
+@admin_login_required
+def delete_trainer(request, trainer_id):
+    """Delete trainer account"""
+    trainer = Trainer.objects.get(id=trainer_id)
+    trainer.delete()
+    return redirect('/manage-trainers')
+
+
+@admin_login_required
+def trainer_details(request, trainer_id):
+    """View trainer details and assigned clients"""
+    trainer = Trainer.objects.get(id=trainer_id)
+    clients = Gym_user.get_users_by_trainer(trainer_id)
+    
+    data = {
+        'trainer': trainer,
+        'clients': clients,
+        'client_count': clients.count()
+    }
+    
+    return render(request, 'trainer_details.html', data)
+
+
+@admin_login_required
+def trainer_attendance_view(request):
+    """View trainer attendance records"""
+    data = {}
+    
+    trainers = Trainer.get_active_trainers()
+    data['trainers'] = trainers
+    
+    # Filter by date range if provided
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+    trainer_id = request.GET.get('trainer_id')
+    
+    if trainer_id:
+        attendance = TrainerAttendance.get_attendance_by_trainer(
+            trainer_id, start_date, end_date
+        )
+        data['attendance'] = attendance
+        data['selected_trainer'] = Trainer.objects.get(id=trainer_id)
+    
+    return render(request, 'trainer_attendance_view.html', data)
+
+
+# ============================================================
+# ADMIN - MEMBERSHIP PLANS (NEW)
+# ============================================================
+@admin_login_required
+def manage_membership_plans(request):
+    """View all membership plans"""
+    plans = MembershipPlan.objects.all()
+    data = {'plans': plans}
+    return render(request, 'manage_membership_plans.html', data)
+
+
+@admin_login_required
+def create_membership_plan(request):
+    """Create new membership plan"""
+    data = {}
+    
+    if request.method == "POST":
+        plan_name = request.POST.get("plan_name")
+        duration = request.POST.get("duration")
+        price = request.POST.get("price")
+        description = request.POST.get("description")
+        
+        MembershipPlan.objects.create(
+            plan_name=plan_name,
+            duration_months=duration,
+            price=price,
+            description=description
+        )
+        
+        return redirect('/manage-membership-plans')
+    
+    return render(request, 'create_membership_plan.html', data)
+
+
+@admin_login_required
+def edit_membership_plan(request, plan_id):
+    """Edit membership plan"""
+    plan = MembershipPlan.objects.get(id=plan_id)
+    data = {'plan': plan}
+    
+    if request.method == "POST":
+        plan.plan_name = request.POST.get("plan_name")
+        plan.duration_months = request.POST.get("duration")
+        plan.price = request.POST.get("price")
+        plan.description = request.POST.get("description")
+        plan.is_active = request.POST.get("is_active") == "on"
+        plan.save()
+        
+        return redirect('/manage-membership-plans')
+    
+    return render(request, 'edit_membership_plan.html', data)
+
+
+@admin_login_required
+def delete_membership_plan(request, plan_id):
+    """Delete membership plan"""
+    plan = MembershipPlan.objects.get(id=plan_id)
+    plan.delete()
+    return redirect('/manage-membership-plans')
+
+
+# ============================================================
+# TRAINER AUTHENTICATION
+# ============================================================
+def trainer_login(request):
+    """Trainer login"""
+    data = {}
+    
+    if request.method == "POST":
+        username = request.POST.get("t_username")
+        password = request.POST.get("t_password")
+        
+        trainer = Trainer.get_trainer_by_username(username)
+        
+        if trainer:
+            if trainer.password == password:
+                if trainer.is_active:
+                    request.session['trainer_id'] = trainer.id
+                    request.session['trainer_username'] = trainer.username
+                    return redirect('/trainer-portal')
+                else:
+                    data["error"] = "Your account has been deactivated. Contact admin."
+            else:
+                data["error"] = "Password is incorrect!"
+        else:
+            data["error"] = "Incorrect username or password!"
+    
+    return render(request, 'trainer_login.html', data)
+
+
+@trainer_login_required
+def trainer_portal(request):
+    """Trainer dashboard"""
+    trainer_id = request.session.get('trainer_id')
+    trainer = Trainer.objects.get(id=trainer_id)
+    
+    data = {}
+    data['trainer'] = trainer
+    
+    # Statistics
+    data['total_clients'] = Gym_user.get_users_by_trainer(trainer_id).count()
+    data['workout_plans'] = WorkoutPlan.get_plans_by_trainer(trainer_id).count()
+    data['diet_plans'] = DietPlan.get_plans_by_trainer(trainer_id).count()
+    
+    return render(request, 'trainer_portal.html', data)
+
+
+def trainer_logout(request):
+    """Trainer logout"""
+    if 'trainer_id' in request.session:
+        del request.session['trainer_id']
+    if 'trainer_username' in request.session:
+        del request.session['trainer_username']
+    return redirect('/')
+
+
+@trainer_login_required
+def trainer_profile(request):
+    """Trainer profile page"""
+    trainer_id = request.session.get('trainer_id')
+    trainer = Trainer.objects.get(id=trainer_id)
+    
+    data = {'trainer': trainer}
+    return render(request, 'trainer_profile.html', data)
+
+
+@trainer_login_required
+def trainer_change_password(request):
+    """Change trainer password"""
+    trainer_id = request.session.get('trainer_id')
+    trainer = Trainer.objects.get(id=trainer_id)
+    
+    data = {'trainer': trainer}
+    
+    if request.method == "POST":
+        new_password = request.POST.get("n_pass")
+        trainer.password = new_password
+        trainer.save()
+        data["msg"] = "Password has been changed successfully!"
+    
+    return render(request, 'trainer_change_password.html', data)
+
+
+# ============================================================
+# TRAINER - CLIENT MANAGEMENT
+# ============================================================
+@trainer_login_required
+def trainer_clients(request):
+    """View assigned clients"""
+    trainer_id = request.session.get('trainer_id')
+    clients = Gym_user.get_users_by_trainer(trainer_id)
+    
+    data = {
+        'trainer_id': trainer_id,
+        'clients': clients
+    }
+    
+    return render(request, 'trainer_clients.html', data)
+
+
+# ============================================================
+# TRAINER - WORKOUT PLAN MANAGEMENT (NEW)
+# ============================================================
+@trainer_login_required
+def create_workout_plan(request):
+    """Create workout plan"""
+    trainer_id = request.session.get('trainer_id')
+    data = {}
+    
+    data['gym_splits'] = Gym_split.objects.all()
+    data['muscle_strengths'] = Muscle_strength.objects.all()
+    
+    if request.method == "POST":
+        plan_name = request.POST.get("plan_name")
+        gym_split_id = request.POST.get("gym_split")
+        muscle_strength_id = request.POST.get("muscle_strength")
+        day_of_week = request.POST.get("day_of_week")
+        target_muscle = request.POST.get("target_muscle")
+        exercises = request.POST.get("exercises")
+        sets_reps = request.POST.get("sets_reps")
+        notes = request.POST.get("notes")
+        
+        WorkoutPlan.objects.create(
+            plan_name=plan_name,
+            trainer_id=trainer_id,
+            gym_split_id=gym_split_id,
+            muscle_strength_id=muscle_strength_id,
+            day_of_week=day_of_week,
+            target_muscle_group=target_muscle,
+            exercises=exercises,
+            sets_reps=sets_reps,
+            notes=notes
+        )
+        
+        data['msg'] = "Workout plan created successfully!"
+    
+    return render(request, 'create_workout_plan.html', data)
+
+
+@trainer_login_required
+def view_workout_plans(request):
+    """View all workout plans created by trainer"""
+    trainer_id = request.session.get('trainer_id')
+    plans = WorkoutPlan.get_plans_by_trainer(trainer_id)
+    
+    data = {'plans': plans}
+    return render(request, 'view_workout_plans.html', data)
+
+
+@trainer_login_required
+def edit_workout_plan(request, plan_id):
+    """Edit workout plan"""
+    plan = WorkoutPlan.objects.get(id=plan_id)
+    
+    # Ensure trainer owns this plan
+    if plan.trainer_id != request.session.get('trainer_id'):
+        return redirect('/view-workout-plans')
+    
+    data = {}
+    data['plan'] = plan
+    data['gym_splits'] = Gym_split.objects.all()
+    data['muscle_strengths'] = Muscle_strength.objects.all()
+    
+    if request.method == "POST":
+        plan.plan_name = request.POST.get("plan_name")
+        plan.gym_split_id = request.POST.get("gym_split")
+        plan.muscle_strength_id = request.POST.get("muscle_strength")
+        plan.day_of_week = request.POST.get("day_of_week")
+        plan.target_muscle_group = request.POST.get("target_muscle")
+        plan.exercises = request.POST.get("exercises")
+        plan.sets_reps = request.POST.get("sets_reps")
+        plan.notes = request.POST.get("notes")
+        plan.save()
+        
+        return redirect('/view-workout-plans')
+    
+    return render(request, 'edit_workout_plan.html', data)
+
+
+@trainer_login_required
+def delete_workout_plan(request, plan_id):
+    """Delete workout plan"""
+    plan = WorkoutPlan.objects.get(id=plan_id)
+    
+    # Ensure trainer owns this plan
+    if plan.trainer_id == request.session.get('trainer_id'):
+        plan.delete()
+    
+    return redirect('/view-workout-plans')
+
+
+# ============================================================
+# TRAINER - DIET PLAN MANAGEMENT (NEW)
+# ============================================================
+@trainer_login_required
+def create_diet_plan(request):
+    """Create diet plan"""
+    trainer_id = request.session.get('trainer_id')
+    data = {}
+    
+    if request.method == "POST":
+        plan_name = request.POST.get("plan_name")
+        target_goal = request.POST.get("target_goal")
+        calorie_range = request.POST.get("calorie_range")
+        meal_breakdown = request.POST.get("meal_breakdown")
+        protein = request.POST.get("protein")
+        carbs = request.POST.get("carbs")
+        fats = request.POST.get("fats")
+        notes = request.POST.get("notes")
+        
+        DietPlan.objects.create(
+            plan_name=plan_name,
+            trainer_id=trainer_id,
+            target_goal=target_goal,
+            calorie_range=calorie_range,
+            meal_breakdown=meal_breakdown,
+            protein_grams=protein,
+            carbs_grams=carbs,
+            fats_grams=fats,
+            notes=notes
+        )
+        
+        data['msg'] = "Diet plan created successfully!"
+    
+    return render(request, 'create_diet_plan.html', data)
+
+
+@trainer_login_required
+def view_diet_plans(request):
+    """View all diet plans created by trainer"""
+    trainer_id = request.session.get('trainer_id')
+    plans = DietPlan.get_plans_by_trainer(trainer_id)
+    
+    data = {'plans': plans}
+    return render(request, 'view_diet_plans.html', data)
+
+
+@trainer_login_required
+def edit_diet_plan(request, plan_id):
+    """Edit diet plan"""
+    plan = DietPlan.objects.get(id=plan_id)
+    
+    # Ensure trainer owns this plan
+    if plan.trainer_id != request.session.get('trainer_id'):
+        return redirect('/view-diet-plans')
+    
+    data = {'plan': plan}
+    
+    if request.method == "POST":
+        plan.plan_name = request.POST.get("plan_name")
+        plan.target_goal = request.POST.get("target_goal")
+        plan.calorie_range = request.POST.get("calorie_range")
+        plan.meal_breakdown = request.POST.get("meal_breakdown")
+        plan.protein_grams = request.POST.get("protein")
+        plan.carbs_grams = request.POST.get("carbs")
+        plan.fats_grams = request.POST.get("fats")
+        plan.notes = request.POST.get("notes")
+        plan.save()
+        
+        return redirect('/view-diet-plans')
+    
+    return render(request, 'edit_diet_plan.html', data)
+
+
+@trainer_login_required
+def delete_diet_plan(request, plan_id):
+    """Delete diet plan"""
+    plan = DietPlan.objects.get(id=plan_id)
+    
+    # Ensure trainer owns this plan
+    if plan.trainer_id == request.session.get('trainer_id'):
+        plan.delete()
+    
+    return redirect('/view-diet-plans')
+
+
+# ============================================================
+# TRAINER - ATTENDANCE (NEW)
+# ============================================================
+@trainer_login_required
+def trainer_mark_attendance(request):
+    """Trainer marks own attendance"""
+    trainer_id = request.session.get('trainer_id')
+    trainer = Trainer.objects.get(id=trainer_id)
+    
+    data = {'trainer': trainer}
+    
+    today = date.today()
+    
+    # Check if already marked today
+    existing = TrainerAttendance.objects.filter(
+        trainer_id=trainer_id,
+        date=today
+    ).first()
+    
+    if existing:
+        data['already_marked'] = True
+        data['attendance'] = existing
+    
+    if request.method == "POST":
+        action = request.POST.get("action")
+        
+        if action == "check_in":
+            from datetime import datetime as dt
+            check_in_time = dt.now().time()
+            
+            if existing:
+                existing.check_in_time = check_in_time
+                existing.is_present = True
+                existing.save()
+            else:
+                TrainerAttendance.objects.create(
+                    trainer_id=trainer_id,
+                    date=today,
+                    check_in_time=check_in_time,
+                    is_present=True
+                )
+            
+            data['msg'] = "Check-in recorded successfully!"
+            
+        elif action == "check_out" and existing:
+            from datetime import datetime as dt
+            existing.check_out_time = dt.now().time()
+            existing.save()
+            data['msg'] = "Check-out recorded successfully!"
+        
+        # Refresh attendance data
+        existing = TrainerAttendance.objects.filter(
+            trainer_id=trainer_id,
+            date=today
+        ).first()
+        data['attendance'] = existing
+    
+    # Get recent attendance history
+    recent_attendance = TrainerAttendance.objects.filter(
+        trainer_id=trainer_id
+    ).order_by('-date')[:10]
+    
+    data['recent_attendance'] = recent_attendance
+    
+    return render(request, 'trainer_mark_attendance.html', data)
+
+
+
